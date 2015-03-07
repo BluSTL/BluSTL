@@ -1,0 +1,81 @@
+
+* DONE alias/signal names for STL properties 
+
+* TODO implement controller for multiple Ws
+
+* DONE run in open loop 
+
+for one horizon. 
+
+** TODO get_controller should construct a controller without history 
+
+** TODO get adv
+
+Constraints that one can enforce on disturbances:
+
+-  Wref +- epsilon margin, should be a vector or a scalar 
+-  absolute bounds -> can be done with only epsi, if 
+-  dif  
+-  STL formula
+
+
+* DONE plot functions
+
+
+* Misc
+** DONE get rid of stupid gt warning
+
+** TODO plot function for open loop ? 
+
+
+* Documentation
+  
+** TODO Intro
+
+BluSTL is a toolbox for reactive control synthesis for continuous and hybrid systems.
+
+** TODO Install instruction 
+
+*** Requirements 
+
+- Matlab with control toolbox
+- MPT3 toolbox (http://people.ee.ethz.ch/~mpt3/) 
+- Gurobi 6.0  (http://www.gurobi.com)
+
+*** Install
+
+Install the required toolboxes and solvers and add BluSTL/src to your path.
+
+Note that Gurobi is a commercial solver providing free academic licenses. BluSTL has been
+mostly tested in this setting. However, BluSTL relies on Yalmip (which is part of the MPT3 toolbox),
+which interfaces with many other solvers. In principle, most MILP/QILP solver should work with
+BluSTL. 
+
+** TODO Class of systems supported
+
+The current version of the toolbox implements controller and adversaries for linear systems. 
+
+** TODO Creating a controller
+
+** TODO Creating an adversary
+
+** TODO Running
+
+** TODO Plotting 
+
+The default plot function now plots everything (i.e., all signals x,y,u,w). The user can pick a subset of signals to plot by changing properties plot_x, plot_y, plot_u and plot_w. E.g.,
+
+Sys.plot_x = [6 13];
+Sys.plot_y = [1];
+Sys.plot_u = [1];
+Sys.plot_w = [];
+
+will plot x6, x13, y1, u1 and nothing for w. Of course, the user can also rewrite the update_plot function in a derived class.
+
+
+** TODO Examples 
+
+*** DONE Signal generator
+
+
+*** TODO quad example

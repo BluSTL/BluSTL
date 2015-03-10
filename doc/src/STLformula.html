@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of STLformula</title>
+  <meta name="keywords" content="STLformula">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">src</a> &gt; STLformula.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>STLformula
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="STLformula.html" class="code" title="">STLformula</a>	</li><li><a href="../src/private/STLdisp.html" class="code" title="function st = STLdisp(phi, opt)">STLdisp</a>	DISP displays a formula</li><li><a href="../src/private/STLdisplay.html" class="code" title="function st = STLdisplay(phis)">STLdisplay</a>	DISPLAY displays a set of formulas</li><li><a href="../src/private/STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>	STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(STLCsys)">STLC_get_adversary</a>	</li><li><a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>	</li><li><a href="STLformula.html" class="code" title="">STLformula</a>	</li><li><a href="../src/private/STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>	STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function phi = STLformula(varargin)</a></li><li><a href="#_sub2" class="code">function st = disp(phi,opt)</a></li><li><a href="#_sub3" class="code">function st = display(phi)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 classdef <a href="STLformula.html" class="code" title="">STLformula</a>
+0002     <span class="comment">%STLformula a class to represent an STL formula</span>
+0003     <span class="comment">%</span>
+0004     
+0005     properties
+0006         id
+0007         st
+0008         interval
+0009         type
+0010         phi
+0011         phi1
+0012         phi2
+0013         phin
+0014         params
+0015         params_interval       
+0016     <span class="keyword">end</span>
+0017     
+0018     methods
+0019         <span class="comment">% just a constructor for now</span>
+0020         <a name="_sub0" href="#_subfunctions" class="code">function phi = STLformula(varargin)</a>
+0021         
+0022             phi.id = varargin{1};
+0023             phi.st = <span class="string">''</span>;
+0024             phi.interval = [0 inf];
+0025             phi.phi = [];
+0026             phi.phi1 = [];
+0027             phi.phi2 = [];
+0028             phi.phin = [];
+0029             phi.type = <span class="string">''</span>;
+0030             phi.params = struct;
+0031             phi.params_interval = struct;
+0032             varargin = varargin(2:end);
+0033 
+0034             <span class="keyword">switch</span> numel(varargin)
+0035                 <span class="keyword">case</span> 0
+0036                     phi.st = <span class="string">'true'</span>;
+0037                     phi.type = <span class="string">'predicate'</span>;
+0038         
+0039                 <span class="keyword">otherwise</span>
+0040                     <span class="keyword">if</span>(numel(varargin)==1 &amp;&amp; ischar(varargin{1}))
+0041                         varargin{1} = regexprep(varargin{1},<span class="string">'eventually'</span>, <span class="string">'ev'</span>);
+0042                         varargin{1} = regexprep(varargin{1},<span class="string">'always'</span>,<span class="string">'alw'</span>);
+0043                         varargin{1} = regexprep(varargin{1},<span class="string">'&lt;='</span>, <span class="string">'&lt;'</span>);
+0044                         varargin{1} = regexprep(varargin{1},<span class="string">'&gt;='</span>, <span class="string">'&gt;'</span>);
+0045                     <span class="keyword">end</span>     
+0046                     phi = <a href="../src/private/STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,varargin{:});
+0047             <span class="keyword">end</span>
+0048         <span class="keyword">end</span>
+0049 
+0050         <a name="_sub1" href="#_subfunctions" class="code">function st = disp(phi,opt)</a>
+0051             st = <a href="../src/private/STLdisp.html" class="code" title="function st = STLdisp(phi, opt)">STLdisp</a>(phi,opt);
+0052         <span class="keyword">end</span>
+0053                 
+0054         <a name="_sub2" href="#_subfunctions" class="code">function st = display(phi)</a>
+0055             st = <a href="../src/private/STLdisplay.html" class="code" title="function st = STLdisplay(phis)">STLdisplay</a>(phi);
+0056         <span class="keyword">end</span>
+0057         
+0058     <span class="keyword">end</span>
+0059         
+0060 <span class="keyword">end</span>
+0061     
+0062</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

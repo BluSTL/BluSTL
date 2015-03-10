@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of STLC_update_plot</title>
+  <meta name="keywords" content="STLC_update_plot">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">src</a> &gt; STLC_update_plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>STLC_update_plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Sys = STLC_update_plot(Sys) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Sys = STLC_update_plot(Sys)</a>
+0002 
+0003 <span class="keyword">if</span> isempty(Sys.h)
+0004     Sys.h.hf = figure;
+0005     nb_plots = numel(Sys.plot_x)+numel(Sys.plot_y)+numel(Sys.plot_u)+numel(Sys.plot_w);
+0006     cur_plot = 1;
+0007     
+0008     <span class="keyword">for</span> iX = Sys.plot_x
+0009         subplot(nb_plots,1,cur_plot);
+0010         hold on; grid on;
+0011         Sys.h.Xpast(iX) = plot(Sys.system_data.time, Sys.system_data.X(iX,:));
+0012         Sys.h.Xmodel(iX) = plot(Sys.model_data.time,Sys.model_data.X(iX,:), <span class="string">'--r'</span>);
+0013         ylabel(Sys.xlabel{iX});
+0014         cur_plot = cur_plot+1;
+0015     <span class="keyword">end</span>
+0016     
+0017     <span class="keyword">for</span> iY = Sys.plot_y
+0018         subplot(nb_plots,1,cur_plot);
+0019         hold on;grid on;
+0020         Sys.h.Ypast(iY) = plot(Sys.system_data.time(1:end-1), Sys.system_data.Y(iY,:));
+0021         Sys.h.Ymodel(iY) = plot(Sys.model_data.time(1:end-1), Sys.model_data.Y(iY,:), <span class="string">'--r'</span>);
+0022         ylabel(Sys.ylabel{iY});
+0023         cur_plot = cur_plot+1;
+0024     <span class="keyword">end</span>
+0025     
+0026     <span class="keyword">for</span> iU = Sys.plot_u
+0027         subplot(nb_plots,1,cur_plot);
+0028         hold on;grid on;
+0029         Sys.h.Upast(iU) = stairs(Sys.system_data.time(1:end-1), Sys.system_data.U(iU,:));
+0030         Sys.h.Umodel(iU) = stairs(Sys.model_data.time(1:end-1),Sys.model_data.U(iU,:), <span class="string">'--r'</span>);
+0031         ylabel([Sys.ulabel{iU}]);
+0032         cur_plot = cur_plot+1;
+0033     <span class="keyword">end</span>
+0034     
+0035     <span class="keyword">for</span> iW = Sys.plot_w
+0036         subplot(nb_plots,1,cur_plot);
+0037         hold on;grid on;
+0038         Sys.h.Wpast(iW) = plot(Sys.system_data.time, Sys.system_data.W(iW,:));
+0039         Sys.h.Wmodel(iW) = plot(Sys.model_data.time(1:end-1),Sys.model_data.W(iW,1:end-1), <span class="string">'--r'</span>);
+0040         ylabel(Sys.wlabel{iW});
+0041         cur_plot = cur_plot+1;
+0042     <span class="keyword">end</span>
+0043     
+0044     Sys.h.hbutton=uicontrol(Sys.h.hf,<span class="string">'style'</span>,<span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+0045         <span class="string">'string'</span>,<span class="string">'Stop'</span>,<span class="keyword">...</span>
+0046         <span class="string">'callback'</span>,<span class="string">'Stop()'</span><span class="keyword">...</span>
+0047         );
+0048 <span class="keyword">else</span>
+0049     
+0050     <span class="keyword">for</span> iX = Sys.plot_x
+0051         set(Sys.h.Xpast(iX), <span class="string">'Xdata'</span>, Sys.system_data.time, <span class="string">'Ydata'</span>,Sys.system_data.X(iX,:));
+0052         set(Sys.h.Xmodel(iX), <span class="string">'Xdata'</span>, Sys.model_data.time,<span class="string">'Ydata'</span>, Sys.model_data.X(iX,:));
+0053     <span class="keyword">end</span>
+0054     
+0055     <span class="keyword">for</span> iY = Sys.plot_y
+0056         set(Sys.h.Ypast(iY), <span class="string">'Xdata'</span>, Sys.system_data.time(1:end-1),<span class="string">'Ydata'</span>,  Sys.system_data.Y(iY,:));
+0057         set(Sys.h.Ymodel(iY), <span class="string">'Xdata'</span>, Sys.model_data.time(1:end-1),<span class="string">'Ydata'</span>, Sys.model_data.Y(iY,:));
+0058     <span class="keyword">end</span>
+0059     
+0060     <span class="keyword">for</span> iU = Sys.plot_u
+0061         set(Sys.h.Upast(iU), <span class="string">'Xdata'</span>, Sys.system_data.time(1:end-1),<span class="string">'Ydata'</span>,  Sys.system_data.U(iU,:));
+0062         set(Sys.h.Umodel(iU), <span class="string">'Xdata'</span>, Sys.model_data.time(1:end-1),<span class="string">'Ydata'</span>, Sys.model_data.U(iU,:));
+0063     <span class="keyword">end</span>
+0064     
+0065     <span class="keyword">for</span> iW = Sys.plot_w
+0066         set(Sys.h.Wpast(iW), <span class="string">'Xdata'</span>, Sys.system_data.time,<span class="string">'Ydata'</span>,  Sys.system_data.W(iW,:));
+0067         set(Sys.h.Wmodel(iW), <span class="string">'Xdata'</span>, Sys.model_data.time(1:end-1),<span class="string">'Ydata'</span>, Sys.model_data.W(iW,1:end-1));
+0068     <span class="keyword">end</span>
+0069     
+0070 <span class="keyword">end</span>
+0071 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getSpecs2</title>
+  <meta name="keywords" content="getSpecs2">
+  <meta name="description" content="Control constraints">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">quadrotor</a> &gt; getSpecs2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/quadrotor&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getSpecs2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Control constraints</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [inits] = getSpecs2( inits, dim, ex) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Control constraints</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [inits] = getSpecs2( inits, dim, ex)</a>
+0002 
+0003 <span class="comment">% Control constraints</span>
+0004 inits.var.Hu = [eye(3); -eye(3)];
+0005 inits.var.Ku = 0.04*[9.935; 3.62; 3.62;  
+0006            4.545; 3.62; 3.62];
+0007 
+0008       
+0009 inits.stl_list = {<span class="comment">%'alw_[0,Inf] ((var.Hx*X(:,t) &lt;= var.Kx))', ...</span>
+0010     <span class="comment">%'alw_[0,Inf] ((var.Hu*U(:,t-1) &lt;= var.Ku))', ...</span>
+0011     
+0012 <span class="comment">%     'alw_[0,Inf] ((ev_[0,6] (X(1:2,t) &gt; [8;8] and  X(1:2,t) &lt; [9;9])))', ...</span>
+0013 <span class="comment">%     'alw_[0,Inf] ((ev_[0,6] (X(1:2,t) &gt; [1;1] and  X(1:2,t) &lt; [2;2])))'};</span>
+0014      
+0015     <span class="string">'ev_[0,Inf] ((X(1:2,t) &lt; [9;9]) and (X(1:2,t) &gt; [8;8]))'</span>, <span class="keyword">...</span>
+0016     <span class="string">'ev_[0,Inf] ((X(1:2,t) &lt; [1;1]) and (X(1:2,t) &gt; [0.5;0.5]))'</span>, <span class="keyword">...</span>
+0017     <span class="string">'ev_[0,Inf] ((X(1:2,t) &lt; [4;2]) and (X(1:2,t) &gt; [3;1]))'</span>};
+0018 
+0019     <span class="comment">%'alw_[0,Inf] (ev_[0,6] (X(1:2,t) &gt;= [1;1]))', ...</span>
+0020     <span class="comment">%'alw_[0,Inf] (ev_[0,6] (X(1:2,t) &lt;= [0.5;0.5]))'};%, ...</span>
+0021     
+0022     
+0023 <span class="keyword">end</span>
+0024</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

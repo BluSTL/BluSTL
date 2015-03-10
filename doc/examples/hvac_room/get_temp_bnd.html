@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of get_temp_bnd</title>
+  <meta name="keywords" content="get_temp_bnd">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">hvac_room</a> &gt; get_temp_bnd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/hvac_room&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>get_temp_bnd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [lowBound, upBound] = get_temp_bnd(Tave, DTocc, DTunocc, Delta, N) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">    
+  generates comfort temperature zones</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="init_hvac_room_data.html" class="code" title="">init_hvac_room_data</a>	</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [lowBound, upBound] = get_temp_bnd(Tave, DTocc, DTunocc, Delta, N)</a>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%  generates comfort temperature zones</span>
+0004 <span class="comment">%</span>
+0005     
+0006     lowBound=zeros(N,1);
+0007     <span class="keyword">for</span> k=1:1:(N/4)
+0008         lowBound(k)= Tave - DTunocc;
+0009         lowBound(0.25*N+k)= Tave - DTocc;
+0010         lowBound(0.5*N+k)= Tave - DTocc;
+0011         lowBound(0.75*N+k)= Tave - DTunocc;
+0012     <span class="keyword">end</span>
+0013 
+0014     <span class="keyword">for</span> k= -Delta:1:Delta
+0015         lowBound(N/4 + k)= ( (Tave-DTocc + Tave-DTunocc)/2 + (1/Delta) * (((Tave-DTocc) - (Tave-DTunocc))/2) * k  );
+0016         lowBound(3*N/4 + k) = ( (Tave-DTocc + Tave-DTunocc)/2 - (1/Delta) * (((Tave-DTocc) - (Tave-DTunocc))/2) * k   );
+0017     <span class="keyword">end</span>
+0018 
+0019     upBound=zeros(N,1);
+0020     <span class="keyword">for</span> k=1:1:(N/4)
+0021         upBound(k)= Tave + DTunocc;
+0022         upBound(0.25*N+k)= Tave + DTocc;
+0023         upBound(0.5*N+k)= Tave + DTocc;
+0024         upBound(0.75*N+k)= Tave + DTunocc;
+0025     <span class="keyword">end</span>
+0026 
+0027    
+0028     <span class="keyword">for</span> k= -Delta:1:Delta
+0029         upBound(N/4 + k)   = (  (Tave + DTocc + Tave + DTunocc)/2 + (1/Delta) * (((Tave + DTocc)-(Tave + DTunocc))/2) * k  );
+0030         upBound(3*N/4 + k) = (   (Tave + DTocc + Tave + DTunocc)/2 - (1/Delta) * (((Tave + DTocc) - (Tave + DTunocc))/2) * k  );
+0031     <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

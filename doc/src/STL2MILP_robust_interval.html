@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of STL2MILP_robust_interval</title>
+  <meta name="keywords" content="STL2MILP_robust_interval">
+  <meta name="description" content="INPUTS">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">src</a> &gt; STL2MILP_robust_interval.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>STL2MILP_robust_interval
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>INPUTS</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">INPUTS
+ phi is an STLformula given as a string
+ k is the length of the trajectory
+ var maps strings to variables that appear in the predicates
+ M   is big-M</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>	INPUTS</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>	INPUTS</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [F,z1,z2] = pred(st,t0, k,var,M)</a></li><li><a href="#_sub2" class="code">function [F,P1,P2] = and(p_list1,p_list2,M)</a></li><li><a href="#_sub3" class="code">function [F,P1,P2] = or(p_list1,p_list2,M)</a></li><li><a href="#_sub4" class="code">function [F,P1,P2] = not(p_list1,p_list2)</a></li><li><a href="#_sub5" class="code">function [F,P_alw1,P_alw2] = always(P1,P2,a,b, k,M)</a></li><li><a href="#_sub6" class="code">function [F,P_ev1,P_ev2] = eventually(P1,P2,a,b, k,M)</a></li><li><a href="#_sub7" class="code">function [F,P_until1,P_until2] = until(Pp1,Pp2,Pq1,Pq2,a,b,k,M)</a></li><li><a href="#_sub8" class="code">function [F,P1,P2] = min_r(p_list1,p_list2,M)</a></li><li><a href="#_sub9" class="code">function [F,P1,P2] = max_r(p_list1,p_list2,M)</a></li><li><a href="#_sub10" class="code">function [F,P1,P2] = until_mins(i,j,Pp1,Pp2,Pq1,Pq2,M)</a></li><li><a href="#_sub11" class="code">function [ia, ib] = getIndices(i,a,b,k)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)</a>
+0002 
+0003     <span class="comment">%INPUTS</span>
+0004     <span class="comment">% phi is an STLformula given as a string</span>
+0005     <span class="comment">% k is the length of the trajectory</span>
+0006     <span class="comment">% var maps strings to variables that appear in the predicates</span>
+0007     <span class="comment">% M   is big-M</span>
+0008         
+0009     <span class="comment">%OUTPUTS</span>
+0010     <span class="comment">%P1,P2 -- sdpvars</span>
+0011     <span class="comment">%F -- constraints on variables in P</span>
+0012 
+0013     <span class="keyword">if</span> (nargin==4);
+0014         M = 1000;
+0015     <span class="keyword">end</span>;
+0016         
+0017     F = [];
+0018     P = struct();
+0019     
+0020     <span class="keyword">if</span> ischar(phi.interval)
+0021         interval = [str2num(phi.interval)];
+0022     <span class="keyword">else</span>
+0023         interval = phi.interval;
+0024     <span class="keyword">end</span>
+0025     
+0026     a = interval(1);
+0027     b = interval(2);
+0028     
+0029     <span class="keyword">if</span> a == Inf
+0030         a = k*ts;
+0031     <span class="keyword">end</span>
+0032     <span class="keyword">if</span> b == Inf
+0033         b = k*ts;
+0034     <span class="keyword">end</span>
+0035     
+0036     a = max([0 floor(a/ts)-1]); 
+0037     b = ceil(b/ts)-1; 
+0038     
+0039     <span class="keyword">switch</span> (phi.type)
+0040         
+0041         <span class="keyword">case</span> <span class="string">'predicate'</span>
+0042             [F,P.P1,P.P2] = <a href="#_sub1" class="code" title="subfunction [F,z1,z2] = pred(st,t0, k,var,M)">pred</a>(phi.st,t0,k,var,M);
+0043                      
+0044         <span class="keyword">case</span> <span class="string">'not'</span>
+0045             [Frest,Prest1,Prest2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi,t0,k,ts, var,M);
+0046             [Fnot, Pnot1,Pnot2] = <a href="#_sub4" class="code" title="subfunction [F,P1,P2] = not(p_list1,p_list2)">not</a>(Prest1,Prest2);
+0047             F = [F, Fnot, Frest];
+0048             P.P1 = Pnot1;
+0049             P.P2 = Pnot2;
+0050 
+0051         <span class="keyword">case</span> <span class="string">'or'</span>
+0052             [Fdis1,Pdis11,Pdis12] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi1,t0,k,ts, var,M);
+0053             [Fdis2,Pdis21,Pdis22] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi2,t0,k,ts, var,M);
+0054             [For, Por1,Por2] = <a href="#_sub3" class="code" title="subfunction [F,P1,P2] = or(p_list1,p_list2,M)">or</a>([Pdis11;Pdis21],[Pdis12;Pdis22],M);
+0055             F = [F, For, Fdis1, Fdis2];
+0056             P.P1 = Por1;
+0057             P.P2 = Por2;
+0058 
+0059         <span class="keyword">case</span> <span class="string">'and'</span>
+0060             [Fcon1,Pcon11,Pcon12] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi1,t0,k,ts, var,M);
+0061             [Fcon2,Pcon21,Pcon22] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi2,t0,k,ts, var,M);
+0062             [Fand,Pand1,Pand2] = <a href="#_sub2" class="code" title="subfunction [F,P1,P2] = and(p_list1,p_list2,M)">and</a>([Pcon11;Pcon21],[Pcon12;Pcon22],M);
+0063             F = [F, Fand, Fcon1, Fcon2];
+0064             P.P1 = Pand1;
+0065             P.P2 = Pand2;
+0066 
+0067         <span class="keyword">case</span> <span class="string">'=&gt;'</span>
+0068             [Fant,Pant1,Pant2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi1,t0,k, ts,var,M);
+0069             [Fcons,Pcons1,Pcons2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi2,t0,k,ts, var,M);
+0070             [Fnotant,Pnotant1,Pnotant2] = <a href="#_sub4" class="code" title="subfunction [F,P1,P2] = not(p_list1,p_list2)">not</a>(Pant1,Pant2);
+0071             [Fimp,Pimp1,Pimp2] = <a href="#_sub3" class="code" title="subfunction [F,P1,P2] = or(p_list1,p_list2,M)">or</a>([Pnotant1;Pcons1],[Pnotant2;Pcons2],M);
+0072             F = [F, Fant, Fnotant, Fcons, Fimp];
+0073             P.P1 = Pimp1;
+0074             P.P2 = Pimp2;
+0075             
+0076         <span class="keyword">case</span> <span class="string">'always'</span>
+0077             [Frest,Prest1,Prest2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi,t0,k, ts, var,M);
+0078             [Falw,Palw1,Palw2] = <a href="#_sub5" class="code" title="subfunction [F,P_alw1,P_alw2] = always(P1,P2,a,b, k,M)">always</a>(Prest1,Prest2,a,b,k,M);
+0079             F = [F, Falw];
+0080             F = [F, Frest];
+0081             P.P1 = Palw1;
+0082             P.P2 = Palw2;
+0083 
+0084         <span class="keyword">case</span> <span class="string">'eventually'</span>
+0085             [Frest,Prest1,Prest2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi,t0,k, ts, var,M);
+0086             [Fev,Pev1,Pev2] = <a href="#_sub6" class="code" title="subfunction [F,P_ev1,P_ev2] = eventually(P1,P2,a,b, k,M)">eventually</a>(Prest1,Prest2,a,b,k,M);
+0087             F = [F, Fev];
+0088             F = [F, Frest];
+0089             P.P1 = Pev1;
+0090             P.P2 = Pev2;
+0091           
+0092         <span class="keyword">case</span> <span class="string">'until'</span>
+0093             [Fp,Pp1,Pp2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi1,t0,k, ts, var,M);
+0094             [Fq,Pq1,Pq2] = <a href="STL2MILP_robust_interval.html" class="code" title="function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)">STL2MILP_robust_interval</a>(phi.phi2,t0,k, ts, var,M);
+0095             [Funtil,Puntil1,Puntil2] = <a href="#_sub7" class="code" title="subfunction [F,P_until1,P_until2] = until(Pp1,Pp2,Pq1,Pq2,a,b,k,M)">until</a>(Pp1,Pp2,Pq1,Pq2,a,b,k,M);
+0096             F = [F,Funtil,Fp,Fq];
+0097             P.P1 = Puntil1;
+0098             P.P2 = Puntil2;
+0099     <span class="keyword">end</span>   
+0100 <span class="keyword">end</span>
+0101 
+0102 <a name="_sub1" href="#_subfunctions" class="code">function [F,z1,z2] = pred(st,t0, k,var,M)</a>
+0103     <span class="comment">% Enforce constraints based on predicates</span>
+0104     <span class="comment">%</span>
+0105     <span class="comment">% var is the variable dictionary</span>
+0106         
+0107     fnames = fieldnames(var);
+0108     
+0109     <span class="keyword">for</span> ifield= 1:numel(fnames)
+0110         eval([ fnames{ifield} <span class="string">'= var.'</span> fnames{ifield} <span class="string">';'</span>]); 
+0111     <span class="keyword">end</span>          
+0112         
+0113     
+0114     st = regexprep(st,<span class="string">'\[t\]'</span>,<span class="string">'\(t\)'</span>); <span class="comment">% Breach compatibility ?</span>
+0115     <span class="keyword">if</span> findstr(<span class="string">'&lt;'</span>, st)
+0116         st = regexprep(st,<span class="string">'&lt;'</span>,<span class="string">'&lt;= '</span>);
+0117         st = regexprep(st,<span class="string">'&lt;= '</span>,<span class="string">' +'</span>);
+0118         st = [<span class="string">'-'</span>,st];
+0119     <span class="keyword">end</span>
+0120     <span class="keyword">if</span> findstr(<span class="string">'&gt;'</span>, st)
+0121         st = regexprep(st,<span class="string">'&gt;'</span>,<span class="string">'&gt;= '</span>);
+0122         st = regexprep(st,<span class="string">'&gt;= '</span>,<span class="string">'-'</span>);
+0123     <span class="keyword">end</span>
+0124          
+0125     F = [];
+0126     
+0127     zAll = [];
+0128     <span class="keyword">for</span> l=1:k
+0129         <span class="comment">% the below conditional statements allow specifications to refer to</span>
+0130         <span class="comment">% the previous and next time steps (e.g. when controlling input)</span>
+0131         t_st = st;
+0132         <span class="keyword">if</span> l&lt;k
+0133             t_st = regexprep(t_st,<span class="string">'t+1\)'</span>,[num2str(l+1) <span class="string">'\)'</span>]);
+0134         <span class="keyword">else</span>
+0135             t_st = regexprep(t_st,<span class="string">'t+1\)'</span>,[num2str(l) <span class="string">'\)'</span>]);
+0136         <span class="keyword">end</span>
+0137         <span class="keyword">if</span> l&gt;1
+0138             t_st = regexprep(t_st,<span class="string">'t-1\)'</span>,[num2str(l-1) <span class="string">'\)'</span>]);
+0139         <span class="keyword">else</span>
+0140             t_st = regexprep(t_st,<span class="string">'t-1\)'</span>,[num2str(l) <span class="string">'\)'</span>]);
+0141         <span class="keyword">end</span>
+0142         t_st = regexprep(t_st,<span class="string">'t\)'</span>,[num2str(l) <span class="string">'\)'</span>]);
+0143         
+0144         zl = sdpvar(size(eval(t_st),1),size(eval(t_st),2));
+0145         zl = eval(t_st); 
+0146         zAll = [zAll,zl];
+0147     <span class="keyword">end</span>
+0148     
+0149     <span class="comment">% take the and over all dimensions for multi-dimensional signals</span>
+0150     z1 = sdpvar(1,k);
+0151     z2 = sdpvar(1,k);
+0152     <span class="keyword">for</span> i=1:k
+0153         [Fnew, z1(i)] = <a href="#_sub2" class="code" title="subfunction [F,P1,P2] = and(p_list1,p_list2,M)">and</a>(zAll(:,i),M);
+0154         F = [F, Fnew];
+0155     <span class="keyword">end</span>
+0156     F = [F, z2 == z1];  
+0157 <span class="keyword">end</span>
+0158 
+0159 <span class="comment">% BOOLEAN OPERATIONS</span>
+0160 
+0161 <a name="_sub2" href="#_subfunctions" class="code">function [F,P1,P2] = and(p_list1,p_list2,M)</a>
+0162     [F,P1,P2] = <a href="#_sub8" class="code" title="subfunction [F,P1,P2] = min_r(p_list1,p_list2,M)">min_r</a>(p_list1,p_list2,M);
+0163 <span class="keyword">end</span>
+0164 
+0165 
+0166 <a name="_sub3" href="#_subfunctions" class="code">function [F,P1,P2] = or(p_list1,p_list2,M)</a>
+0167      [F,P1,P2] = <a href="#_sub9" class="code" title="subfunction [F,P1,P2] = max_r(p_list1,p_list2,M)">max_r</a>(p_list1,p_list2,M);
+0168 <span class="keyword">end</span>
+0169 
+0170 
+0171 <a name="_sub4" href="#_subfunctions" class="code">function [F,P1,P2] = not(p_list1,p_list2)</a>
+0172     k = size(p_list1,2);
+0173     m = size(p_list1,1);
+0174     assert( m == 1 )
+0175     P1 = sdpvar(1,k);
+0176     P2 = sdpvar(1,k);
+0177     F = [P1 == -p_list2, P2 == -p_list1];
+0178 <span class="keyword">end</span>
+0179 
+0180 
+0181 
+0182 <span class="comment">% TEMPORAL OPERATIONS</span>
+0183 
+0184 <a name="_sub5" href="#_subfunctions" class="code">function [F,P_alw1,P_alw2] = always(P1,P2,a,b, k,M)</a>
+0185     F = [];
+0186     P_alw1 = sdpvar(1,k);
+0187     P_alw2 = sdpvar(1,k);
+0188     
+0189     <span class="keyword">for</span> i = 1:k
+0190         [ia, ib] = <a href="#_sub11" class="code" title="subfunction [ia, ib] = getIndices(i,a,b,k)">getIndices</a>(i,a,b,k);
+0191         [F0,P01,P02] = <a href="#_sub2" class="code" title="subfunction [F,P1,P2] = and(p_list1,p_list2,M)">and</a>(P1(ia:ib)',P2(ia:ib)',M);
+0192         F = [F;F0,P_alw1(i)==P01,P_alw2(i)==P02];
+0193     <span class="keyword">end</span>
+0194     
+0195 <span class="keyword">end</span>
+0196 
+0197 
+0198 <a name="_sub6" href="#_subfunctions" class="code">function [F,P_ev1,P_ev2] = eventually(P1,P2,a,b, k,M)</a>
+0199     F = [];
+0200     P_ev1 = sdpvar(1,k);
+0201     P_ev2 = sdpvar(1,k);
+0202     
+0203     <span class="keyword">for</span> i = 1:k
+0204         [ia, ib] = <a href="#_sub11" class="code" title="subfunction [ia, ib] = getIndices(i,a,b,k)">getIndices</a>(i,a,b,k);
+0205         [F0,P01,P02] = <a href="#_sub3" class="code" title="subfunction [F,P1,P2] = or(p_list1,p_list2,M)">or</a>(P1(ia:ib)',P2(ia:ib)',M);
+0206         F = [F;F0,P_ev1(i)==P01,P_ev2(i)==P02];
+0207     <span class="keyword">end</span>
+0208     
+0209 <span class="keyword">end</span>
+0210 
+0211 
+0212 <a name="_sub7" href="#_subfunctions" class="code">function [F,P_until1,P_until2] = until(Pp1,Pp2,Pq1,Pq2,a,b,k,M)</a>
+0213     
+0214     F = [];
+0215     P_until1 = sdpvar(1,k);
+0216     P_until2 = sdpvar(1,k);
+0217     
+0218     <span class="keyword">for</span> i = 1:k
+0219         [ia, ib] = <a href="#_sub11" class="code" title="subfunction [ia, ib] = getIndices(i,a,b,k)">getIndices</a>(i,a,b,k);
+0220         F0 = []; 
+0221         P01 = [];
+0222         P02 = [];
+0223         <span class="keyword">for</span> j = ia:ib
+0224             [F1,P11,P12] = <a href="#_sub10" class="code" title="subfunction [F,P1,P2] = until_mins(i,j,Pp1,Pp2,Pq1,Pq2,M)">until_mins</a>(i,j,Pp1,Pp2,Pq1,Pq2,M);
+0225             F0 = [F0, F1];
+0226             P01 = [P01,P11];
+0227             P02 = [P02,P12];
+0228         <span class="keyword">end</span>
+0229         [F4,P41,P42] = <a href="#_sub9" class="code" title="subfunction [F,P1,P2] = max_r(p_list1,p_list2,M)">max_r</a>(P01,P02);
+0230         F = [F;F0,F4,P_until1(i)==P41,P_until2(i)==P42];
+0231     <span class="keyword">end</span>
+0232     
+0233 <span class="keyword">end</span>
+0234 
+0235 
+0236 <span class="comment">% UTILITY FUNCTIONS</span>
+0237 
+0238 <a name="_sub8" href="#_subfunctions" class="code">function [F,P1,P2] = min_r(p_list1,p_list2,M)</a>
+0239     
+0240     k = size(p_list1,2);
+0241     m = size(p_list1,1);
+0242     
+0243     P1 = sdpvar(1,k);
+0244     z1 = binvar(m,k);
+0245     
+0246     P2 = sdpvar(1,k);
+0247     z2 = binvar(m,k);
+0248      
+0249     F = [sum(z1,1) == ones(1,k),sum(z2,1) == ones(1,k)];
+0250     <span class="keyword">for</span> t=1:k
+0251         <span class="keyword">for</span> i=1:m
+0252             F = [F, P1(t) &lt;= p_list1(i,t)];     
+0253             F = [F, p_list1(i,t) - (1-z1(i,t))*M &lt;= P1(t) &lt;= p_list1(i,t) + (1-z1(i,t))*M];
+0254             F = [F, P1(t) &lt;= p_list(i,t)];     
+0255             F = [F, p_list1(i,t) - (1-z1(i,t))*M &lt;= P1(t) &lt;= p_list1(i,t) + (1-z1(i,t))*M];
+0256         
+0257             F = [F, P2(t) &lt;= p_list2(i,t)];     
+0258             F = [F, p_list2(i,t) - (1-z2(i,t))*M &lt;= P2(t) &lt;= p_list2(i,t) + (1-z2(i,t))*M];
+0259             F = [F, P2(t) &lt;= p_list(i,t)];     
+0260             F = [F, p_list2(i,t) - (1-z2(i,t))*M &lt;= P2(t) &lt;= p_list2(i,t) + (1-z2(i,t))*M];
+0261         
+0262         <span class="keyword">end</span>
+0263     <span class="keyword">end</span>
+0264 <span class="keyword">end</span>
+0265 
+0266 <a name="_sub9" href="#_subfunctions" class="code">function [F,P1,P2] = max_r(p_list1,p_list2,M)</a>
+0267 
+0268     k = size(p_list,2);
+0269     m = size(p_list,1);
+0270     
+0271     P1 = sdpvar(1,k);
+0272     z1 = binvar(m,k);
+0273     
+0274     P2 = sdpvar(1,k);
+0275     z2 = binvar(m,k);
+0276     
+0277     F = [sum(z1,1) == ones(1,k),sum(z2,1) == ones(1,k)];
+0278     <span class="keyword">for</span> t=1:k
+0279         <span class="keyword">for</span> i=1:m
+0280             F = [F, P1(t) &gt;= p_list1(i,t)];     
+0281             F = [F, p_list1(i,t) - (1-z1(i,t))*M &lt;= P1(t) &lt;= p_list1(i,t) + (1-z1(i,t))*M];
+0282             
+0283             F = [F, P2(t) &gt;= p_list2(i,t)];     
+0284             F = [F, p_list2(i,t) - (1-z2(i,t))*M &lt;= P2(t) &lt;= p_list2(i,t) + (1-z2(i,t))*M];        
+0285         <span class="keyword">end</span>
+0286     <span class="keyword">end</span>
+0287 <span class="keyword">end</span>
+0288 
+0289 <a name="_sub10" href="#_subfunctions" class="code">function [F,P1,P2] = until_mins(i,j,Pp1,Pp2,Pq1,Pq2,M)</a>
+0290     [F0,P01,P02] = <a href="#_sub8" class="code" title="subfunction [F,P1,P2] = min_r(p_list1,p_list2,M)">min_r</a>(Pp1(i:j)',Pp2(i:j)',M);
+0291     [F1,P1,P2] = <a href="#_sub8" class="code" title="subfunction [F,P1,P2] = min_r(p_list1,p_list2,M)">min_r</a>([Pq1(j),P01],[Pq2(j),P02],M);
+0292     F = [F0,F1];
+0293 <span class="keyword">end</span>
+0294 
+0295 <a name="_sub11" href="#_subfunctions" class="code">function [ia, ib] = getIndices(i,a,b,k)</a>
+0296     ia = min(k,i+a);
+0297     ib = min(k,i+b);
+0298 <span class="keyword">end</span>
+0299 
+0300 
+0301</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

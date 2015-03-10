@@ -1,0 +1,8 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  grid_system -> grid_system;
+  test_grid_system -> grid_system;
+
+  grid_system [URL="grid_system.html"];
+  test_grid_system [URL="test_grid_system.html"];
+}

@@ -1,0 +1,9 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  simple_cars -> simple_cars;
+  test_simple_cars -> simple_cars;
+
+  init_plot [URL="init_plot.html"];
+  simple_cars [URL="simple_cars.html"];
+  test_simple_cars [URL="test_simple_cars.html"];
+}

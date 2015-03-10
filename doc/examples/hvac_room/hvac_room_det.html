@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hvac_room_det</title>
+  <meta name="keywords" content="hvac_room_det">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">hvac_room</a> &gt; hvac_room_det.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/hvac_room&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>hvac_room_det
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="hvac_room_det.html" class="code" title="">hvac_room_det</a>	</li><li><a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="hvac_room_det.html" class="code" title="">hvac_room_det</a>	</li><li><a href="test_hvac_room.html" class="code" title="">test_hvac_room</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function HR = hvac_room_det()</a></li><li><a href="#_sub2" class="code">function HR = init_control(HR,L)</a></li><li><a href="#_sub3" class="code">function Sys = update_plot(Sys)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 classdef <a href="hvac_room_det.html" class="code" title="">hvac_room_det</a> &lt;<a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>
+0002         
+0003     methods
+0004         <a name="_sub0" href="#_subfunctions" class="code">function HR = hvac_room_det()</a>
+0005             load hvac_room_data  <span class="comment">% note: this file is created by Init_RoomHVAC</span>
+0006             <span class="comment">%% Create the system</span>
+0007             HR = HR@<a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>(A,Bu,Bw);
+0008             
+0009             <span class="comment">%% Naming stuff</span>
+0010             
+0011             HR.xlabel{1} = <span class="string">'Twall1'</span>;
+0012             HR.xlabel{2} = <span class="string">'Twall2'</span>;
+0013             HR.xlabel{3} = <span class="string">'Twall3'</span>;
+0014             HR.xlabel{4} = <span class="string">'Twall4'</span>;
+0015             HR.xlabel{5} = <span class="string">'Troom'</span>;
+0016             HR.wlabel{1} = <span class="string">'Tdis8'</span>;
+0017             HR.wlabel{2} = <span class="string">'T7'</span>;
+0018             HR.wlabel{3} = <span class="string">'Tout'</span>;
+0019             HR.wlabel{4} = <span class="string">'T10'</span>;
+0020             HR.wlabel{5} = <span class="string">'Qsun'</span>;
+0021             HR.wlabel{6} = <span class="string">'Tcomf_low'</span>;
+0022             HR.wlabel{7} = <span class="string">'occ'</span>;
+0023             
+0024             <span class="comment">%   HR = init_control(HR);</span>
+0025         <span class="keyword">end</span>
+0026     <span class="keyword">end</span>
+0027     methods
+0028         <a name="_sub1" href="#_subfunctions" class="code">function HR = init_control(HR,L)</a>
+0029             load hvac_room_data
+0030             <span class="comment">%% Controller Initialisation</span>
+0031             <span class="comment">% Time</span>
+0032             HR.time = 0:1:1439; <span class="comment">% time for the dynamics</span>
+0033             HR.ts=30; <span class="comment">% sampling time for controller</span>
+0034             HR.L=L;  <span class="comment">% horizon (# of steps)</span>
+0035             HR.nb_stages=2; <span class="comment">% repeats time</span>
+0036             
+0037             HR.max_react_iter=100;
+0038             HR.min_rob = .01;
+0039             HR.lambda_rho = 500;
+0040             HR.bigM = 10000;
+0041             
+0042             <span class="comment">% Input constraints</span>
+0043             HR.u_lb=0;
+0044             HR.u_ub=65;
+0045             HR.u_delta=Inf;
+0046             
+0047             <span class="comment">% Disturbance signal</span>
+0048             HR.Wref = Wref;
+0049             HR.solver_options = sdpsettings(<span class="string">'solver'</span>,<span class="string">'gurobi'</span>,<span class="string">'verbose'</span>,1, <span class="string">'cachesolvers'</span>,1);
+0050             
+0051             <span class="comment">%HR.w_ub(7) = 2;</span>
+0052             
+0053             <span class="comment">% Initial state</span>
+0054             HR.x0 = X0;
+0055             
+0056             <span class="comment">%% STL formula</span>
+0057             HR.stl_list{1} = <span class="string">'alw_[0, Inf] ((1000*occ(t) &gt; 0) =&gt; (Troom(t) &gt; Tcomf_low(t)))'</span>;
+0058  <span class="comment">%          HR.stl_list{2} = 'alw_[0, Inf] ( X(5,t)&gt; 67)';</span>
+0059             
+0060             <span class="comment">%% Plotting</span>
+0061             HR.plot_x = [5];
+0062             HR.plot_w = [4 7];
+0063             
+0064             <span class="comment">%% Running stuff</span>
+0065             fprintf(<span class="string">'Computing controller...\n'</span>);
+0066             
+0067             tic
+0068             HR.controller = get_controller(HR);
+0069             toc
+0070             
+0071             fprintf(<span class="string">'Computing adversary...\n'</span>);
+0072             tic
+0073             HR.adversary = get_adversary(HR);
+0074             toc
+0075             
+0076         <span class="keyword">end</span>
+0077         
+0078         <a name="_sub2" href="#_subfunctions" class="code">function Sys = update_plot(Sys)</a>
+0079             
+0080             <span class="keyword">if</span> isempty(Sys.h)
+0081                 time = Sys.time;
+0082                 nb_stages=Sys.nb_stages;
+0083                 ntime = zeros(1, nb_stages*numel(time));
+0084                 <span class="keyword">for</span> istage = 0:nb_stages-1
+0085                     ntime(istage*numel(time)+1:(istage+1)*numel(time))= time+istage*(time(end)+time(2)) ;
+0086                 <span class="keyword">end</span>
+0087                 time = ntime;
+0088                 
+0089                 Wref = repmat(Sys.Wref,1,Sys.nb_stages);
+0090                 
+0091                 XLim = [0 Sys.nb_stages*Sys.time(end)/60+1];
+0092                 Sys.h.hf = figure;
+0093                 
+0094                 <span class="comment">% Temperature</span>
+0095                 subplot(5,1,1:3);
+0096                 hold on; grid on;
+0097     
+0098                 Sys.h.Tpast = plot(Sys.system_data.time/60, Sys.system_data.X(5,1:end-1), <span class="string">'LineWidth'</span>,2);
+0099                 Sys.h.Toutpast = plot(Sys.system_data.time/60, Sys.system_data.W(3,:), <span class="string">'-m'</span>, <span class="string">'LineWidth'</span>,2);
+0100                 Sys.h.Tmodel = plot(Sys.model_data.time/60,Sys.model_data.X(5,:), <span class="string">'--g'</span>,<span class="string">'LineWidth'</span>,2);
+0101                 legend(<span class="string">'Room Temperature'</span>, <span class="string">'Outside Temperature'</span>,<span class="string">'Model prediction'</span>, <span class="string">'Comfort Region'</span>)
+0102                     
+0103                 <span class="comment">% Tout</span>
+0104 
+0105                 plot(time(1:60:end)/60, Wref(6,1:60:end), <span class="string">'-k'</span>,<span class="string">'LineWidth'</span>,2)
+0106                 legend(<span class="string">'Room Temperature'</span>, <span class="string">'Outside Temperature'</span>,<span class="string">'Model prediction'</span>, <span class="string">'Comfort Region'</span>)
+0107         
+0108                 plot(time(1:60:end)/60, 2*70-Wref(6,1:60:end), <span class="string">'-k'</span>,<span class="string">'LineWidth'</span>,2)
+0109     
+0110                 plot(time(1:180:end)/60, Wref(3,1:180:end)+Sys.w_lb(3), <span class="string">'-m'</span>,<span class="string">'LineWidth'</span>,1)
+0111                 plot(time(1:180:end)/60, Wref(3,1:180:end), <span class="string">'--m'</span>,<span class="string">'LineWidth'</span>,1);
+0112                 plot(time(1:180:end)/60, Wref(3,1:180:end)+Sys.w_ub(3), <span class="string">'-m'</span>,<span class="string">'LineWidth'</span>,1)
+0113               <span class="comment">%  xlabel('Time (hours)')</span>
+0114                 ylabel(<span class="string">'Temperatures (°F)'</span>);
+0115                 set(gca, <span class="string">'XLim'</span>,XLim , <span class="string">'XTick'</span>, 0:3:nb_stages*24, <span class="string">'FontSize'</span>, 14 );
+0116                 
+0117                 <span class="comment">% occupancy</span>
+0118                 subplot(5,1,4);
+0119                 hold on;grid on;
+0120                 stairs(time/60, Wref(7,:), <span class="string">'-k'</span>, <span class="string">'LineWidth'</span>,2);
+0121                 ylabel(<span class="string">'Occupancy'</span>);
+0122                <span class="comment">% xlabel('Time (hours)')</span>
+0123                 set(gca, <span class="string">'XLim'</span>, XLim, <span class="string">'YLim'</span>, [-1.1 1.1], <span class="string">'XTick'</span>, 0:3:nb_stages*24, <span class="string">'FontSize'</span>, 14);
+0124                 
+0125                 subplot(5,1,5);
+0126                 hold on;grid on;
+0127                 Sys.h.Upast = stairs(Sys.system_data.time/60, Sys.system_data.U(1,:),<span class="string">'LineWidth'</span>,3);
+0128                 Sys.h.Umodel = stairs(Sys.model_data.time(1:end-1)/60,Sys.model_data.U(1,:), <span class="string">'--gr'</span>,<span class="string">'LineWidth'</span>,2);
+0129                 xlabel(<span class="string">'Time (hours)'</span>)
+0130 
+0131                 ylabel(<span class="string">'Input Air Flow (ft^3/min)'</span>);
+0132                 set(gca, <span class="string">'XLim'</span>, XLim, <span class="string">'XTick'</span>, 0:3:nb_stages*24, <span class="string">'FontSize'</span>, 14);
+0133                 
+0134                 Sys.h.hbutton=uicontrol(Sys.h.hf,<span class="string">'style'</span>,<span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+0135                     <span class="string">'string'</span>,<span class="string">'Stop'</span>,<span class="keyword">...</span>
+0136                     <span class="string">'callback'</span>,<span class="string">'Stop()'</span><span class="keyword">...</span>
+0137                     );
+0138             <span class="keyword">else</span>
+0139                 set(Sys.h.Tpast, <span class="string">'Xdata'</span>, Sys.system_data.time/60, <span class="string">'Ydata'</span>,Sys.system_data.X(5,1:end-1));
+0140                 
+0141                 set(Sys.h.Toutpast, <span class="string">'Xdata'</span>, Sys.system_data.time(1:4:end)/60, <span class="string">'Ydata'</span>,Sys.system_data.W(3,1:4:end));
+0142   
+0143                 set(Sys.h.Tmodel, <span class="string">'Xdata'</span>, Sys.model_data.time/60,<span class="string">'Ydata'</span>, Sys.model_data.X(5,:));
+0144                 
+0145                 set(Sys.h.Upast, <span class="string">'Xdata'</span>, Sys.system_data.time/60,<span class="string">'Ydata'</span>,  Sys.system_data.U(1,:));
+0146                 set(Sys.h.Umodel, <span class="string">'Xdata'</span>, Sys.model_data.time(1:end-1)/60,<span class="string">'Ydata'</span>, Sys.model_data.U(1,:));
+0147                 
+0148             <span class="keyword">end</span>
+0149             
+0150             
+0151         <span class="keyword">end</span>
+0152     <span class="keyword">end</span>
+0153     
+0154     
+0155 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of envLTL</title>
+  <meta name="keywords" content="envLTL">
+  <meta name="description" content="envLTL Creates environment (workspace)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="../index.html">quadrotor</a> &gt; <a href="index.html">env</a> &gt; envLTL.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/quadrotor/env&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>envLTL
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>envLTL Creates environment (workspace)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function env = envLTL(ex) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">envLTL Creates environment (workspace)
+
+ Input: 'ex' number representing the desired environment
+ Output: 'env' struct mapping labels to unions of polytopes
+
+ :copyright: 2014 by the California Institute of Technology
+ :license: BSD 3-Clause, see LICENSE for details</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="getNotAP.html" class="code" title="function env = getNotAP(env)">getNotAP</a>	getNotAP Create negation of APs in env</li><li><a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>	poly Creates box polytope from upper/lower bounds</li><li><a href="mergePoly.html" class="code" title="function env = mergePoly(env)">mergePoly</a>	mergePoly Merges polytopes that represent the environment</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../examples/quadrotor/getSpecs.html" class="code" title="function [inits] = getSpecs( inits, dim, ex)">getSpecs</a>	% Create the environment</li><li><a href="../../../examples/quadrotor/init_plot.html" class="code" title="function h = init_plot(hist_data,pred_data,Aux,nb_stages,time,legends)">init_plot</a>	</li><li><a href="../../../examples/quadrotor/quad_system.html" class="code" title="">quad_system</a>	</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function env = envLTL(ex)</a>
+0002 <span class="comment">%envLTL Creates environment (workspace)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Input: 'ex' number representing the desired environment</span>
+0005 <span class="comment">% Output: 'env' struct mapping labels to unions of polytopes</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% :copyright: 2014 by the California Institute of Technology</span>
+0008 <span class="comment">% :license: BSD 3-Clause, see LICENSE for details</span>
+0009 
+0010 env = struct();
+0011 env.util = struct();
+0012 env.work = struct();
+0013 env.AP = struct();
+0014 env.notAP = struct();
+0015 
+0016 e = 0.3;    <span class="comment">% expansion/contraction factor</span>
+0017 env.util.e = e;
+0018 
+0019 <span class="keyword">if</span> 0 == ex
+0020     xmin = 0;   xmax = 8;
+0021     ymin = 0;   ymax = 8;
+0022     arena = [xmin, xmax, ymin, ymax];
+0023     workspace = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>(arena);
+0024 
+0025     <span class="comment">% Create labled regions</span>
+0026     obs = [ <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([2,4, 5,7], e), <span class="keyword">...</span>
+0027             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,6, 2,4], e) ];
+0028     env.work.unsafe = obs;
+0029     env.work.safe = regiondiff(workspace, obs);    
+0030 
+0031     env.AP.a = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([6,7, 5,6]);
+0032     env.AP.b = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([3,4, 0,1]);
+0033     env.AP.c = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 3,4]);
+0034     
+0035 <span class="keyword">elseif</span> 2 == ex
+0036     xmin = 0;   xmax = 8;
+0037     ymin = 0;   ymax = 8;
+0038     arena = [xmin, xmax, ymin, ymax];
+0039     workspace = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>(arena);
+0040 
+0041     <span class="comment">% Create labled regions</span>
+0042     obs = [ <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([2,4, 5,7], e), <span class="keyword">...</span>
+0043             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,6, 2,4], e) ];
+0044     env.work.unsafe = obs;
+0045     env.work.safe = regiondiff(workspace, obs);    
+0046 
+0047     env.AP.a = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([6,7, 5,6]);
+0048     env.AP.b = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([3,4, 0,1]);
+0049     env.AP.c = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 4,5]);
+0050     
+0051 <span class="keyword">elseif</span> 3 == ex
+0052     xmin = 0;   xmax = 8;
+0053     ymin = 0;   ymax = 8;
+0054     zmin = 0;   zmax = 8;
+0055     arena = [xmin, xmax, ymin, ymax, zmin, zmax];
+0056     workspace = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>(arena);
+0057 
+0058     <span class="comment">% Create labled regions</span>
+0059     obs = [ <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([2,4, 5,7, 2,6], e), <span class="keyword">...</span>
+0060             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,6, 2,4, 2,6], e) ];
+0061     env.work.unsafe = obs;
+0062     env.work.safe = regiondiff(workspace, obs);    
+0063 
+0064     env.AP.a = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([6,7, 6,7, 0,1]);
+0065     env.AP.b = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([3,4, 0,1, 6,7]);
+0066     env.AP.c = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 4,5, 4,6]);
+0067     
+0068 <span class="keyword">elseif</span> 4 == ex
+0069     xmin = 0;   xmax = 8;
+0070     ymin = 0;   ymax = 8;
+0071     arena = [xmin, xmax, ymin, ymax];
+0072     workspace = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>(arena);
+0073 
+0074     <span class="comment">% Create labled regions</span>
+0075     obs = [ <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([2,4, 5,7], e), <span class="keyword">...</span>
+0076             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,6, 2,4], e), <span class="keyword">...</span>
+0077             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 7,8], e), <span class="keyword">...</span>
+0078             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 3,4], e)];
+0079     env.work.unsafe = obs;
+0080     env.work.safe = regiondiff(workspace, obs);    
+0081 
+0082     env.AP.a = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([6,7, 5,6]);
+0083     env.AP.b = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([3,4, 0,1]);
+0084     env.AP.c = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 4,5]);
+0085     env.AP.d = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([7,8, 3,4]);
+0086     env.AP.e = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,5, 6,8]);
+0087     
+0088 <span class="keyword">elseif</span> 5 == ex
+0089     xmin = 0;   xmax = 8;
+0090     ymin = 0;   ymax = 8;
+0091     zmin = 0;   zmax = 8;
+0092     arena = [xmin, xmax, ymin, ymax, zmin, zmax];
+0093     workspace = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>(arena);
+0094 
+0095     <span class="comment">% Create labled regions</span>
+0096     obs = [ <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([2,4, 5,7, 2,6], e), <span class="keyword">...</span>
+0097             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,6, 2,4, 2,6], e), <span class="keyword">...</span>
+0098             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 7,8, 2,6], e), <span class="keyword">...</span>
+0099             <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 3,4, 2,6], e)];
+0100     env.work.unsafe = obs;
+0101     env.work.safe = regiondiff(workspace, obs);    
+0102 
+0103     env.AP.a = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([6,7, 6,7, 0,1]);
+0104     env.AP.b = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([3,4, 0,1, 6,7]);
+0105     env.AP.c = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([1,2, 4,5, 4,6]);
+0106     env.AP.d = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([7,8, 3,4, 4,6]);
+0107     env.AP.e = <a href="getPoly.html" class="code" title="function poly = getPoly(varargin)">getPoly</a>([4,5, 6,8, 2,3]);
+0108     
+0109 <span class="keyword">else</span>
+0110     error(<span class="string">'Invalid example number.'</span>);
+0111 <span class="keyword">end</span>
+0112 
+0113 env.util.arena = arena;
+0114 env.work.workspace = workspace;
+0115 env.util.dim = dimension(workspace);
+0116 
+0117 env = <a href="getNotAP.html" class="code" title="function env = getNotAP(env)">getNotAP</a>(env);
+0118 
+0119 fprintf(<span class="string">'Reducing polytopes...\n'</span>);
+0120 env.work = <a href="mergePoly.html" class="code" title="function env = mergePoly(env)">mergePoly</a>(env.work);
+0121 env.AP = <a href="mergePoly.html" class="code" title="function env = mergePoly(env)">mergePoly</a>(env.AP);
+0122 env.notAP = <a href="mergePoly.html" class="code" title="function env = mergePoly(env)">mergePoly</a>(env.notAP);
+0123 
+0124 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

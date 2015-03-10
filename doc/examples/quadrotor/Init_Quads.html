@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of Init_Quads</title>
+  <meta name="keywords" content="Init_Quads">
+  <meta name="description" content="Quadrotor linearized about hover (van der Burg 13)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">quadrotor</a> &gt; Init_Quads.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/quadrotor&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>Init_Quads
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Quadrotor linearized about hover (van der Burg 13)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Quadrotor linearized about hover (van der Burg 13)
+ x = (p,v, r,w),     u = (uf,ux,uy)
+ p = position (m),   v = velocity (m/s)
+ r = attitude (rad), w = angular velocity (rad/s)
+
+ Model adapted from LTLOpt (http://www.cds.caltech.edu/~ewolff/ltlopt.html)
+
+
+ Input: 'dt' timestep (sec)
+        'N' length of traj
+        'dim' workspace dimension (2D or 3D)
+ Output: 'X' sdpvar for state
+         'U' sdpvar for control
+         'F' dynamic constraints
+         'sys' system info</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getSpecs.html" class="code" title="function [inits] = getSpecs( inits, dim, ex)">getSpecs</a>	% Create the environment</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Quadrotor linearized about hover (van der Burg 13)</span>
+0002 <span class="comment">% x = (p,v, r,w),     u = (uf,ux,uy)</span>
+0003 <span class="comment">% p = position (m),   v = velocity (m/s)</span>
+0004 <span class="comment">% r = attitude (rad), w = angular velocity (rad/s)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Model adapted from LTLOpt (http://www.cds.caltech.edu/~ewolff/ltlopt.html)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% Input: 'dt' timestep (sec)</span>
+0010 <span class="comment">%        'N' length of traj</span>
+0011 <span class="comment">%        'dim' workspace dimension (2D or 3D)</span>
+0012 <span class="comment">% Output: 'X' sdpvar for state</span>
+0013 <span class="comment">%         'U' sdpvar for control</span>
+0014 <span class="comment">%         'F' dynamic constraints</span>
+0015 <span class="comment">%         'sys' system info</span>
+0016 
+0017 
+0018 <span class="comment">% Parameters (modified from van der Burg 13)</span>
+0019 g = 9.81;       <span class="comment">% gravity (m/s^2)</span>
+0020 m = 1;          <span class="comment">% mass (kg)</span>
+0021 arm = 0.25;       <span class="comment">% length of rotor arm (m)</span>
+0022 J = 20*m*arm^2;   <span class="comment">% moment of inertia (kg m^2) (est)</span>
+0023 
+0024 tmp = [0 g; -g 0; 0 0];
+0025 A = [zeros(3),   eye(3),     zeros(3,2), zeros(3,2); 
+0026       zeros(3),   zeros(3),   tmp,        zeros(3,2); 
+0027       zeros(2,3), zeros(2,3), zeros(2),   eye(2);
+0028       zeros(2,3), zeros(2,3), zeros(2),   zeros(2)];
+0029 
+0030 
+0031 tmp = [0; 0; 1/m];
+0032 B = [zeros(3,1) zeros(3,2) zeros(3,1); 
+0033       tmp        zeros(3,2) zeros(3,1); 
+0034       zeros(2,1) zeros(2,2) zeros(2,1); 
+0035       zeros(2,1) arm/J*eye(2) zeros(2,1)];
+0036   
+0037 sys = ss(A,B,[],[]);
+0038 
+0039 
+0040 <span class="comment">%% INITIALIZATION</span>
+0041 
+0042 <span class="comment">%% Time</span>
+0043 inits.ts=0.5; <span class="comment">% sampling time (sec)</span>
+0044 inits.L=10;  <span class="comment">% horizon (# of steps)</span>
+0045 inits.time = 0:1:200; <span class="comment">% time for the date</span>
+0046 inits.nb_stages=1;
+0047 
+0048 <span class="comment">%% System dimensions and variables</span>
+0049 inits.nx = 10;    <span class="comment">% num states</span>
+0050 inits.nu = 3;     <span class="comment">% num inputs</span>
+0051 inits.nw = 1;     <span class="comment">% dim disturbances</span>
+0052 inits.dim = 3;  <span class="comment">% dim env</span>
+0053 inits.var = struct();
+0054 
+0055 <span class="comment">%% Bounds</span>
+0056 inits.u_lb=-Inf;
+0057 inits.u_ub=Inf;
+0058 inits.u_delta=Inf;   
+0059 
+0060 <span class="comment">%% Create the STL specifications</span>
+0061 inits = <a href="getSpecs.html" class="code" title="function [inits] = getSpecs( inits, dim, ex)">getSpecs</a>(inits);
+0062 
+0063 <span class="comment">%% Disturbance signal</span>
+0064 w = 0*ones(1,numel(inits.time));
+0065 Wref = w;
+0066 
+0067 <span class="comment">%% AUXILIARY SIGNALS</span>
+0068 Aux = [];
+0069 
+0070 inits.legends = [];
+0071   
+0072 <span class="comment">%% Initial state</span>
+0073 X0=[0.5; 0.5; 0.0; zeros(7,1)];
+0074 
+0075 <span class="comment">%% SAVE</span>
+0076 addpath(<span class="string">'../../src'</span>)
+0077 warning(<span class="string">'off'</span>,<span class="string">'YALMIP:strict'</span>);
+0078 
+0079 save(<span class="string">'Quad_data.mat'</span>);</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of STLC_lti</title>
+  <meta name="keywords" content="STLC_lti">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">src</a> &gt; STLC_lti.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>STLC_lti
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(STLCsys)">STLC_get_adversary</a>	</li><li><a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>	</li><li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li><li><a href="STLC_run_adversarial.html" class="code" title="function [Sys, params] = STLC_run_adversarial(Sys, controller,adversary)">STLC_run_adversarial</a>	</li><li><a href="STLC_run_deterministic.html" class="code" title="function [Sys, params] = STLC_run_deterministic(Sys, controller)">STLC_run_deterministic</a>	</li><li><a href="STLC_run_open_loop.html" class="code" title="function [Sys, params] = STLC_run_open_loop(Sys, controller)">STLC_run_open_loop</a>	</li><li><a href="STLC_run_open_loop_adv.html" class="code" title="function [Sys, params] = STLC_run_open_loop_adv(Sys, controller, adversary)">STLC_run_open_loop_adv</a>	</li><li><a href="STLC_update_plot.html" class="code" title="function Sys = STLC_update_plot(Sys)">STLC_update_plot</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="../examples/grid_system/grid_system.html" class="code" title="">grid_system</a>	</li><li><a href="../examples/hvac_room/hvac_room.html" class="code" title="">hvac_room</a>	</li><li><a href="../examples/hvac_room/hvac_room_det.html" class="code" title="">hvac_room_det</a>	</li><li><a href="../examples/quadrotor/quad_system.html" class="code" title="">quad_system</a>	</li><li><a href="../examples/signal_generator/signal_generator.html" class="code" title="">signal_generator</a>	</li><li><a href="../examples/signal_generator/test_signal_generator.html" class="code" title="">test_signal_generator</a>	% Create the system</li><li><a href="../examples/simple_cars/simple_cars.html" class="code" title="">simple_cars</a>	</li><li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function Sys = STLC_lti(varargin)</a></li><li><a href="#_sub2" class="code">function [x1, y1] = system_step(Sys, x0, u0, w0)</a></li><li><a href="#_sub3" class="code">function obj = get_objective(Sys, X, Y, U,W, rho,wr)</a></li><li><a href="#_sub4" class="code">function controller = get_controller(Sys)</a></li><li><a href="#_sub5" class="code">function adversary = get_adversary(Sys)</a></li><li><a href="#_sub6" class="code">function [system_data, params] = run_open_loop(Sys, controller)</a></li><li><a href="#_sub7" class="code">function [Sys, params] = run_deterministic(Sys, controller)</a></li><li><a href="#_sub8" class="code">function [Sys, params] = run_open_loop_adv(Sys, controller, adversary)</a></li><li><a href="#_sub9" class="code">function [Sys, params] = run_adversarial(Sys, controller, adversary)</a></li><li><a href="#_sub10" class="code">function Sys = update_plot(Sys)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 classdef <a href="STLC_lti.html" class="code" title="">STLC_lti</a>
+0002     <span class="comment">%STLC_lti generic ABCD/ABuBwCDuDw system controller</span>
+0003     <span class="comment">%</span>
+0004     
+0005     <span class="comment">% system properties</span>
+0006     properties
+0007         sys      <span class="comment">% system as control toolbox objec</span>
+0008         sysd
+0009         nx
+0010         ny
+0011         nu
+0012         nw
+0013         x0
+0014         system_data
+0015     <span class="keyword">end</span>
+0016     
+0017     
+0018     <span class="comment">% controller properties</span>
+0019     properties
+0020         u_lb
+0021         u_ub
+0022         u_delta
+0023         ts         <span class="comment">% sampling time</span>
+0024         L          <span class="comment">% horizon</span>
+0025         time
+0026         nb_stages
+0027         var
+0028         stl_list
+0029         encoding  <span class="comment">% specifies the technique for encoding TODO</span>
+0030         min_rob    <span class="comment">% TODO: if rob==0 use non robust encoding</span>
+0031         lambda_rho <span class="comment">%  weight of robustness in the cost function</span>
+0032         bigM
+0033         solver_options
+0034         model_data
+0035         controller    <span class="comment">% YALMIP parametric problem for the adversary</span>
+0036 
+0037     <span class="keyword">end</span>
+0038     
+0039     <span class="comment">% adversary properties</span>
+0040     properties
+0041         Wref         <span class="comment">% this defines a default or initial disturbance vector</span>
+0042         w_lb         <span class="comment">% lower bound on w relative to Wref</span>
+0043         w_ub         <span class="comment">% upper bound on w relative to Wref</span>
+0044         stl_w_list   <span class="comment">% stl properties for environment</span>
+0045         max_react_iter <span class="comment">% maximum number of iterations</span>
+0046         adversary    <span class="comment">% YALMIP parametric problem for the adversary</span>
+0047     <span class="keyword">end</span>
+0048         
+0049     <span class="comment">% plotting properties</span>
+0050     properties
+0051         h
+0052         xlabel  <span class="comment">% labels (names) for x signals</span>
+0053         ylabel
+0054         ulabel
+0055         wlabel
+0056         plot_x  <span class="comment">% indices of states to plot</span>
+0057         plot_y  <span class="comment">% indices of outputs to plot</span>
+0058         plot_u  <span class="comment">% index of inputs to plot</span>
+0059         plot_w  <span class="comment">% index of disturbances to plot</span>
+0060     <span class="keyword">end</span>
+0061     
+0062     <span class="comment">% misc</span>
+0063     properties
+0064        verbosity 
+0065     <span class="keyword">end</span>
+0066     
+0067     methods
+0068         <a name="_sub0" href="#_subfunctions" class="code">function Sys = STLC_lti(varargin)</a>
+0069             
+0070             <span class="keyword">switch</span> nargin
+0071                 
+0072                 <span class="keyword">case</span> 2
+0073                     <span class="comment">% constructor from AB system</span>
+0074                     A = varargin{1};
+0075                     Bu = varargin{2};
+0076                     Bw = [];
+0077                     C = [];
+0078                     Du = [];
+0079                     Dw = [];
+0080                     
+0081                 <span class="keyword">case</span> 3
+0082                     <span class="comment">% constructor from ABuBw system</span>
+0083                     A = varargin{1};
+0084                     Bu = varargin{2};
+0085                     Bw = varargin{3};
+0086                     C = [];
+0087                     Du = [];
+0088                     Dw = [];
+0089                     
+0090                 <span class="keyword">case</span> 4
+0091                     <span class="comment">% constructor from ABCD system</span>
+0092                     A = varargin{1};
+0093                     Bu = varargin{2};
+0094                     Bw = [];
+0095                     C = varargin{3};
+0096                     Du = varargin{4};
+0097                     Dw = [];
+0098                     
+0099                     <span class="comment">% constructor from ABuBwCDuDw system</span>
+0100                 <span class="keyword">case</span> 6
+0101                     A = varargin{1};
+0102                     Bu = varargin{2};
+0103                     Bw = varargin{3};
+0104                     C = varargin{4};
+0105                     Du = varargin{5};
+0106                     Dw = varargin{6};
+0107                     
+0108             <span class="keyword">end</span>
+0109             
+0110             nx = max([size(A,1), size(Bu,1), size(Bw,1),1]);
+0111             nu = max([size(Bu,2), size(Du,1)]);
+0112             <span class="keyword">if</span> nu == 0
+0113                 errormsg(<span class="string">'System must have at least one input (non empty Bu or Du matrix)'</span>);
+0114             <span class="keyword">end</span>
+0115             nw = max([size(Bw,2), size(Dw,1),1]);
+0116             ny = max([size(C,1), size(Du,1), size(Dw,1),1]);
+0117             
+0118             <span class="comment">% default plots everything</span>
+0119             Sys.plot_x = 1:max([size(A,1), size(Bu,1), size(Bw,1)]);
+0120             Sys.plot_u = 1:nu;
+0121             Sys.plot_y = 1:max([size(C,1), size(Du,1), size(Dw,1)]);
+0122             Sys.plot_w = 1:max([size(Bw,2), size(Dw,1)]);
+0123             
+0124             
+0125             <span class="comment">% checks empty matrices</span>
+0126             <span class="keyword">if</span> isempty(A) <span class="comment">% no state</span>
+0127                 A = zeros(nx,nx);
+0128             <span class="keyword">end</span>
+0129             
+0130             <span class="keyword">if</span> isempty(Bu)
+0131                 Bu = zeros(nx,nu);
+0132             <span class="keyword">end</span>
+0133             
+0134             <span class="keyword">if</span> isempty(Bw) <span class="comment">% no disturbance</span>
+0135                 Bw = zeros(nx,nw);
+0136             <span class="keyword">end</span>
+0137             
+0138             <span class="keyword">if</span> isempty(C)
+0139                 C = zeros(ny,nx);
+0140             <span class="keyword">end</span>
+0141             
+0142             <span class="keyword">if</span> isempty(Du)
+0143                 Du = zeros(ny,nu);
+0144             <span class="keyword">end</span>
+0145             
+0146             <span class="keyword">if</span> isempty(Dw)
+0147                 Dw = zeros(ny,nw);
+0148             <span class="keyword">end</span>
+0149             
+0150             Sys.sys = ss(A,[Bu Bw],C,[Du Dw]);
+0151             Sys.nx = size(A,2);
+0152             Sys.nu = size(Bu,2);
+0153             Sys.nw = size(Bw,2);
+0154             Sys.ny = size(C,1);
+0155             Sys.x0 = zeros(Sys.nx,1);
+0156              
+0157            
+0158             <span class="comment">% default label names</span>
+0159             Sys.xlabel = cell(1,nx);
+0160             <span class="keyword">for</span> iX = 1:Sys.nx
+0161                 Sys.xlabel{iX} = [<span class="string">'x'</span> num2str(iX)];
+0162             <span class="keyword">end</span>
+0163             
+0164             <span class="keyword">for</span> iY = 1:Sys.ny
+0165                 Sys.ylabel{iY} = [<span class="string">'y'</span> num2str(iY)];
+0166             <span class="keyword">end</span>
+0167             
+0168             <span class="keyword">for</span> iU = 1:Sys.nu
+0169                 Sys.ulabel{iU} = [<span class="string">'u'</span> num2str(iU)];
+0170             <span class="keyword">end</span>
+0171             
+0172             <span class="keyword">for</span> iW = 1:Sys.nw
+0173                 Sys.wlabel{iW} = [<span class="string">'w'</span> num2str(iW)];
+0174             <span class="keyword">end</span>
+0175             
+0176             <span class="comment">% default options</span>
+0177             Sys.solver_options = sdpsettings(<span class="string">'solver'</span>,<span class="string">'gurobi'</span>,<span class="string">'verbose'</span>,1, <span class="string">'cachesolvers'</span>,1);
+0178             Sys.min_rob = 0.01;
+0179             Sys.lambda_rho = 0;
+0180             Sys.bigM = 1000;
+0181             Sys.u_delta = Inf;
+0182             Sys.max_react_iter = 10;
+0183             
+0184             <span class="comment">% default values for input constraints - note, forces u to 0</span>
+0185             Sys.u_lb = zeros(1,Sys.nu);
+0186             Sys.u_ub = zeros(1,Sys.nu);
+0187             Sys.u_delta = Inf*ones(1,Sys.nu);
+0188             
+0189             <span class="comment">% default values for disturbance constraints - note:w_lb and w_ub are relative to Wref</span>
+0190             <span class="comment">% i.e.,   wref+w_lb  &lt;= w &lt;= wref + w_ub. Thus by default, w == Wref</span>
+0191             Sys.w_lb = zeros(1,Sys.nw);
+0192             Sys.w_ub = zeros(1,Sys.nw);
+0193             
+0194         <span class="keyword">end</span>
+0195         
+0196         <span class="comment">% TODO continuous-time for system step, interface to other (NL,</span>
+0197         <span class="comment">% Simulink, external) dynamics)</span>
+0198         <a name="_sub1" href="#_subfunctions" class="code">function [x1, y1] = system_step(Sys, x0, u0, w0)</a>
+0199             x1 = Sys.sysd.A*x0+ Sys.sysd.B*[u0; w0];
+0200             y1 = Sys.sysd.C*x1+ Sys.sysd.D*[u0; w0];
+0201         <span class="keyword">end</span>
+0202                
+0203         <span class="comment">% default objective function r is the robust sat. and wr a weight</span>
+0204         <a name="_sub2" href="#_subfunctions" class="code">function obj = get_objective(Sys, X, Y, U,W, rho,wr)</a>
+0205             <span class="keyword">switch</span> nargin
+0206                 <span class="keyword">case</span> 4
+0207                     obj = sum(sum(abs(U))); <span class="comment">% minimize U</span>
+0208                 <span class="keyword">case</span> 6
+0209                     obj = sum(sum(abs(U)))-sum(rho); <span class="comment">% minimize U penalized by r</span>
+0210                 <span class="keyword">case</span> 7
+0211                     obj = sum(sum(abs(U)))-wr*sum(rho);
+0212             <span class="keyword">end</span>
+0213         <span class="keyword">end</span>
+0214         
+0215         <a name="_sub3" href="#_subfunctions" class="code">function controller = get_controller(Sys)</a>
+0216             Sys.sysd = c2d(Sys.sys, Sys.ts);
+0217             controller = <a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>(Sys);
+0218         <span class="keyword">end</span>
+0219         
+0220         <a name="_sub4" href="#_subfunctions" class="code">function adversary = get_adversary(Sys)</a>
+0221             Sys.sysd = c2d(Sys.sys, Sys.ts);
+0222             adversary = <a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(STLCsys)">STLC_get_adversary</a>(Sys);
+0223         <span class="keyword">end</span>
+0224         
+0225         <span class="comment">% Executes the controller in open loop mode</span>
+0226         <a name="_sub5" href="#_subfunctions" class="code">function [system_data, params] = run_open_loop(Sys, controller)</a>
+0227             [system_data, params] = <a href="STLC_run_open_loop.html" class="code" title="function [Sys, params] = STLC_run_open_loop(Sys, controller)">STLC_run_open_loop</a>(Sys, controller);
+0228         <span class="keyword">end</span>
+0229         
+0230         <span class="comment">% Executes the controller in a receding horizon (MPC)</span>
+0231         <a name="_sub6" href="#_subfunctions" class="code">function [Sys, params] = run_deterministic(Sys, controller)</a>
+0232             [Sys, params] = <a href="STLC_run_deterministic.html" class="code" title="function [Sys, params] = STLC_run_deterministic(Sys, controller)">STLC_run_deterministic</a>(Sys, controller);
+0233         <span class="keyword">end</span>
+0234         
+0235         <span class="comment">% Executes controller and adversary in open loop</span>
+0236         <a name="_sub7" href="#_subfunctions" class="code">function [Sys, params] = run_open_loop_adv(Sys, controller, adversary)</a>
+0237             [Sys, params] = <a href="STLC_run_open_loop_adv.html" class="code" title="function [Sys, params] = STLC_run_open_loop_adv(Sys, controller, adversary)">STLC_run_open_loop_adv</a>(Sys, controller, adversary);
+0238         <span class="keyword">end</span>
+0239         
+0240         <span class="comment">% Executes controller and adversary in receding horizon mode (MPC)</span>
+0241         <a name="_sub8" href="#_subfunctions" class="code">function [Sys, params] = run_adversarial(Sys, controller, adversary)</a>
+0242             [Sys, params] = <a href="STLC_run_adversarial.html" class="code" title="function [Sys, params] = STLC_run_adversarial(Sys, controller,adversary)">STLC_run_adversarial</a>(Sys, controller, adversary);
+0243         <span class="keyword">end</span>
+0244         
+0245         <span class="comment">% Default plot function</span>
+0246         <a name="_sub9" href="#_subfunctions" class="code">function Sys = update_plot(Sys)</a>
+0247             Sys = <a href="STLC_update_plot.html" class="code" title="function Sys = STLC_update_plot(Sys)">STLC_update_plot</a>(Sys);
+0248         <span class="keyword">end</span>
+0249     <span class="keyword">end</span>
+0250 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

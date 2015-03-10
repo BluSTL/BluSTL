@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of STLdisp</title>
+  <meta name="keywords" content="STLdisp">
+  <meta name="description" content="DISP displays a formula">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">src</a> &gt; <a href="index.html">private</a> &gt; STLdisp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src/private&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>STLdisp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>DISP displays a formula</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function st = STLdisp(phi, opt) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">DISP displays a formula
+ 
+ Synopsis: st = STLdisp(phi[, opt])
+ 
+ Inputs:
+  - phi : the formula to display
+  - opt : (Optional, default=1) when printing predicate, if -1, the
+          function doesn't display the id, if 0, display predicates in
+          full, otherwise, display id and not predicates
+ 
+ Outputs:
+  - st : the string</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../src/STLformula.html" class="code" title="">STLformula</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function st = form_string(phi, opt)</a></li><li><a href="#_sub2" class="code">function intst = form_interval_string(interval)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function st = STLdisp(phi, opt)</a>
+0002 <span class="comment">%DISP displays a formula</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Synopsis: st = STLdisp(phi[, opt])</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Inputs:</span>
+0007 <span class="comment">%  - phi : the formula to display</span>
+0008 <span class="comment">%  - opt : (Optional, default=1) when printing predicate, if -1, the</span>
+0009 <span class="comment">%          function doesn't display the id, if 0, display predicates in</span>
+0010 <span class="comment">%          full, otherwise, display id and not predicates</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Outputs:</span>
+0013 <span class="comment">%  - st : the string</span>
+0014 <span class="comment">%</span>
+0015 
+0016 <span class="keyword">if</span> ~exist(<span class="string">'opt'</span>,<span class="string">'var'</span>)
+0017     opt=1;
+0018 <span class="keyword">end</span>
+0019 
+0020 <span class="keyword">if</span> strcmp(phi.type, <span class="string">'predicate'</span>)
+0021     st = phi.st;
+0022     
+0023     <span class="keyword">if</span>(opt) 
+0024         fnames = fieldnames(phi.params);
+0025         <span class="keyword">for</span> i = 1:numel(fnames)
+0026             <span class="keyword">if</span> ~strcmp(fnames{i}, <span class="string">'pre_pred'</span> )
+0027                 st = regexprep(st,[<span class="string">'\&lt;'</span> fnames{i} <span class="string">'\&gt;'</span>],num2str(phi.params.(fnames{i})));
+0028             <span class="keyword">end</span>
+0029         <span class="keyword">end</span>
+0030     <span class="keyword">end</span>
+0031     
+0032 <span class="keyword">else</span>
+0033     st = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi,opt);
+0034 <span class="keyword">end</span>
+0035 
+0036 <span class="keyword">end</span>
+0037 
+0038 <a name="_sub1" href="#_subfunctions" class="code">function st = form_string(phi, opt)</a>
+0039 <span class="comment">%FORM_STRING</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">% Synopsis: st = form_string(phi, opt)</span>
+0042 <span class="comment">%</span>
+0043 
+0044 <span class="keyword">switch</span>(phi.type)
+0045     <span class="keyword">case</span> <span class="string">'predicate'</span>
+0046         <span class="keyword">if</span>(opt == 0 || ~isempty(regexp(phi.id,<span class="string">'.+__$'</span>, <span class="string">'once'</span>)))
+0047             st = phi.st;
+0048         <span class="keyword">else</span>
+0049             st = phi.id;
+0050         <span class="keyword">end</span>
+0051         
+0052     <span class="keyword">case</span> <span class="string">'not'</span>
+0053         st1 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi,opt);
+0054         st = [<span class="string">'not ('</span> st1 <span class="string">')'</span> ];
+0055         
+0056     <span class="keyword">case</span> <span class="string">'=&gt;'</span>
+0057         st1 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi1,opt);
+0058         st2 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi2,opt);
+0059         st = [<span class="string">'('</span> st1 <span class="string">') =&gt; ('</span> st2 <span class="string">')'</span>];
+0060         
+0061     <span class="keyword">case</span> <span class="string">'or'</span>
+0062         st1 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi1,opt);
+0063         st2 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi2,opt);
+0064         st  = [<span class="string">'('</span> st1 <span class="string">') or ('</span> st2 <span class="string">')'</span>];
+0065         
+0066     <span class="keyword">case</span> <span class="string">'and'</span>
+0067         st1 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi1,opt);
+0068         st2 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi2,opt);
+0069         st = [<span class="string">'('</span> st1 <span class="string">') and ('</span> st2 <span class="string">')'</span>];
+0070         
+0071     <span class="keyword">case</span> <span class="string">'andn'</span>
+0072         st = cell(1,numel(phi.phin));
+0073         <span class="keyword">for</span> ii=1:numel(phi.phin)
+0074             st{ii} = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phin(ii),opt);
+0075         <span class="keyword">end</span>
+0076         st = sprintf(<span class="string">'%s, '</span>,st{:});
+0077         st = [<span class="string">'andn('</span>,st(1:end-2),<span class="string">')'</span>];
+0078         
+0079     <span class="keyword">case</span> <span class="string">'always'</span>
+0080         st = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi,opt);
+0081         
+0082         intst = phi.interval;
+0083         <span class="keyword">try</span>
+0084             I = eval(phi.interval);
+0085         <span class="keyword">catch</span>
+0086             I = [0 0];
+0087         <span class="keyword">end</span>
+0088         
+0089         <span class="keyword">if</span>(I==[0 inf])
+0090             st = [<span class="string">'alw ('</span> st <span class="string">')'</span>];
+0091         <span class="keyword">else</span>
+0092             st = [<span class="string">'alw_'</span> intst <span class="string">' ('</span> st <span class="string">')'</span>];
+0093         <span class="keyword">end</span>
+0094         
+0095     <span class="keyword">case</span> <span class="string">'eventually'</span>
+0096         st = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi,opt);
+0097         intst = phi.interval;
+0098         <span class="keyword">try</span>
+0099             I = eval(phi.interval);
+0100         <span class="keyword">catch</span>
+0101             I = [0 0];
+0102         <span class="keyword">end</span>
+0103         
+0104         <span class="keyword">if</span>(I==[0 inf])
+0105             st = [<span class="string">'ev ('</span> st <span class="string">')'</span>];
+0106         <span class="keyword">else</span>
+0107             st = [<span class="string">'ev_'</span> intst <span class="string">' ('</span> st <span class="string">')'</span>];
+0108         <span class="keyword">end</span>
+0109         
+0110     <span class="keyword">case</span> <span class="string">'until'</span>
+0111         st1 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi1,opt);
+0112         st2 = <a href="#_sub1" class="code" title="subfunction st = form_string(phi, opt)">form_string</a>(phi.phi2,opt);
+0113         
+0114         intst = phi.interval;
+0115         <span class="keyword">try</span>
+0116             I = eval(phi.interval);
+0117         <span class="keyword">catch</span>
+0118             I = [0 0];
+0119         <span class="keyword">end</span>
+0120         
+0121         
+0122         <span class="keyword">if</span>(I==[0 inf])
+0123             st = [<span class="string">'('</span> st1 <span class="string">') until ('</span> st2 <span class="string">')'</span>];
+0124         <span class="keyword">else</span>
+0125             st = [<span class="string">'('</span> st1 <span class="string">')'</span> <span class="string">' until_'</span> intst <span class="string">' ('</span> st2 <span class="string">')'</span>];
+0126         <span class="keyword">end</span>
+0127         
+0128         
+0129 <span class="keyword">end</span>
+0130 
+0131 <span class="keyword">end</span>
+0132 
+0133 <a name="_sub2" href="#_subfunctions" class="code">function intst = form_interval_string(interval)</a>
+0134 
+0135 intst = [ <span class="string">'['</span> num2str(interval(1)) <span class="string">', '</span> num2str(interval(2)) <span class="string">']'</span> ];
+0136 
+0137 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

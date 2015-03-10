@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of init_plot</title>
+  <meta name="keywords" content="init_plot">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">quadrotor</a> &gt; init_plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/quadrotor&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>init_plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function h = init_plot(hist_data,pred_data,Aux,nb_stages,time,legends) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../examples/quadrotor/env/envLTL.html" class="code" title="function env = envLTL(ex)">envLTL</a>	envLTL Creates environment (workspace)</li><li><a href="../../examples/quadrotor/env/plotEnv.html" class="code" title="function h = plotEnv(env, obstacles)">plotEnv</a>	plotEnv Plots labeled environment</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function h = init_plot(hist_data,pred_data,Aux,nb_stages,time,legends)</a>
+0002 
+0003     h = struct();
+0004     <span class="comment">%% Create the environment</span>
+0005     ex = 5;
+0006     env = <a href="../../examples/quadrotor/env/envLTL.html" class="code" title="function env = envLTL(ex)">envLTL</a>(ex);
+0007     obstacles = env.work.unsafe;
+0008     h.hf = <a href="../../examples/quadrotor/env/plotEnv.html" class="code" title="function h = plotEnv(env, obstacles)">plotEnv</a>(env, obstacles);
+0009 
+0010     hold on;
+0011     zlabel(<span class="string">'z (m)'</span>);
+0012     h.Xpast = plot3(hist_data.Xf(1,:)', hist_data.Xf(2,:)', hist_data.Xf(3,:)', <span class="keyword">...</span>
+0013                 <span class="string">'ob'</span>, <span class="string">'markersize'</span>, 6, <span class="string">'markerfacecolor'</span>, <span class="string">'b'</span>);
+0014     hold on;
+0015     h.Xpred = plot3(pred_data.Xf(1,:),pred_data.Xf(2,:), pred_data.Xf(3,:), <span class="keyword">...</span>
+0016                 <span class="string">'og'</span>, <span class="string">'markersize'</span>, 6, <span class="string">'markerfacecolor'</span>, <span class="string">'g'</span>);
+0017   
+0018     hbutton=uicontrol(h.hf,<span class="string">'style'</span>,<span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+0019                           <span class="string">'string'</span>,<span class="string">'Stop'</span>,<span class="keyword">...</span>
+0020                           <span class="string">'callback'</span>,<span class="string">'Stop()'</span><span class="keyword">...</span>
+0021                       );        
+0022                   
+0023    
+0024 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

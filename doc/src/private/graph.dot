@@ -1,0 +1,8 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  STLparse -> STLparse;
+
+  STLdisp [URL="STLdisp.html"];
+  STLdisplay [URL="STLdisplay.html"];
+  STLparse [URL="STLparse.html"];
+}

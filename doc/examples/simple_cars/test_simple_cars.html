@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of test_simple_cars</title>
+  <meta name="keywords" content="test_simple_cars">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">simple_cars</a> &gt; test_simple_cars.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/simple_cars&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>test_simple_cars
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="simple_cars.html" class="code" title="">simple_cars</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 clear;
+0002 close all;
+0003 <span class="comment">%% Create the system</span>
+0004 
+0005 <span class="comment">%A1 = [1, 1; 0, 1 ]; %[x y]_t = [x y]_{t-1} + [1 1; 0 1][x y]_{t-1} + [0; 1]u_{t-1}</span>
+0006 SC = <a href="simple_cars.html" class="code" title="">simple_cars</a>();
+0007 
+0008 <span class="comment">%% Controller Initialisation</span>
+0009 <span class="comment">% Time</span>
+0010 SC.time = 0:.1:30; <span class="comment">% time for the dynamics</span>
+0011 SC.ts=.2; <span class="comment">% sampling time for controller</span>
+0012 SC.L=20;  <span class="comment">% horizon (# of steps)</span>
+0013 SC.nb_stages=1; <span class="comment">% repeats time</span>
+0014 
+0015 <span class="comment">% Input constraints</span>
+0016 SC.u_lb=-1;
+0017 SC.u_ub=1;
+0018 SC.u_delta=Inf; 
+0019 
+0020 <span class="comment">% Disturbance signal</span>
+0021 w = 0*SC.time;
+0022 w(1:5) =-2;
+0023 Wref = w;
+0024 
+0025 SC.Wref = Wref;
+0026 SC.w_lb(:) = -.1;
+0027 SC.w_ub(:) = .1;
+0028 
+0029 <span class="comment">%% Initial state</span>
+0030 X1 = [-10 0]';
+0031 X2 = [10 0]';
+0032 X0 = [X1; X2];
+0033 SC.x0 = X0;
+0034 
+0035 <span class="comment">%% STL formula</span>
+0036 SC.stl_list = {<span class="string">'alw_[0, Inf] ( (abs( X(1,t) - X(3,t) ) &lt; 2) =&gt; alw_[0, 2] ( abs(X(2,t)) &lt; 0.1 ))'</span>}; 
+0037 
+0038 
+0039 <span class="comment">%% Plotting</span>
+0040 <span class="comment">%SC.plot_x = 5;</span>
+0041 <span class="comment">%SC.plot_w = [7];</span>
+0042 
+0043 <span class="comment">%% Running stuff</span>
+0044 fprintf(<span class="string">'Computing controller...\n'</span>);
+0045 controller = get_controller(SC);
+0046 fprintf(<span class="string">'Computing adversary...\n'</span>);
+0047 adversary = get_adversary(SC) 
+0048 fprintf(<span class="string">'Running...'</span>)
+0049 <span class="comment">%SC = run_open_loop(SC, controller);</span>
+0050 SC = run_adversarial(SC, controller, adversary)
+0051 fprintf(<span class="string">'\ndone.\n'</span>);
+0052</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,7 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  signal_generator -> signal_generator;
+
+  signal_generator [URL="signal_generator.html"];
+  test_signal_generator [URL="test_signal_generator.html"];
+}

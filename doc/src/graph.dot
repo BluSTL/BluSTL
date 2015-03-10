@@ -1,0 +1,33 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  STL2MILP_robust -> STL2MILP_robust;
+  STL2MILP_robust_interval -> STL2MILP_robust_interval;
+  STLC_get_adversary -> STL2MILP_robust;
+  STLC_get_adversary -> STLC_parse_stl_labels;
+  STLC_get_adversary -> STLformula;
+  STLC_get_controller -> STL2MILP_robust;
+  STLC_get_controller -> STLC_parse_stl_labels;
+  STLC_get_controller -> STLformula;
+  STLC_lti -> STLC_get_adversary;
+  STLC_lti -> STLC_get_controller;
+  STLC_lti -> STLC_lti;
+  STLC_lti -> STLC_run_adversarial;
+  STLC_lti -> STLC_run_deterministic;
+  STLC_lti -> STLC_run_open_loop;
+  STLC_lti -> STLC_run_open_loop_adv;
+  STLC_lti -> STLC_update_plot;
+  STLformula -> STLformula;
+
+  STL2MILP_robust [URL="STL2MILP_robust.html"];
+  STL2MILP_robust_interval [URL="STL2MILP_robust_interval.html"];
+  STLC_get_adversary [URL="STLC_get_adversary.html"];
+  STLC_get_controller [URL="STLC_get_controller.html"];
+  STLC_lti [URL="STLC_lti.html"];
+  STLC_parse_stl_labels [URL="STLC_parse_stl_labels.html"];
+  STLC_run_adversarial [URL="STLC_run_adversarial.html"];
+  STLC_run_deterministic [URL="STLC_run_deterministic.html"];
+  STLC_run_open_loop [URL="STLC_run_open_loop.html"];
+  STLC_run_open_loop_adv [URL="STLC_run_open_loop_adv.html"];
+  STLC_update_plot [URL="STLC_update_plot.html"];
+  STLformula [URL="STLformula.html"];
+}

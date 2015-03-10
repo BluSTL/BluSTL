@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of simple_cars</title>
+  <meta name="keywords" content="simple_cars">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">simple_cars</a> &gt; simple_cars.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/simple_cars&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>simple_cars
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="simple_cars.html" class="code" title="">simple_cars</a>	</li><li><a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="simple_cars.html" class="code" title="">simple_cars</a>	</li><li><a href="test_simple_cars.html" class="code" title="">test_simple_cars</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function SC = simple_cars()</a></li><li><a href="#_sub2" class="code">function obj = get_objective(Sys, X, Y, U)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 classdef <a href="simple_cars.html" class="code" title="">simple_cars</a> &lt; <a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>
+0002     
+0003     methods
+0004         <a name="_sub0" href="#_subfunctions" class="code">function SC = simple_cars()</a>
+0005             
+0006             A1 = [0, 1; 0, 0];
+0007             B1 = [0; 1];
+0008             
+0009             A2 = [0, 1; 0, 0];
+0010             B2 = [0; 1];
+0011             
+0012             IA = eye(2);
+0013             OA = zeros(2);
+0014             OAv = zeros(2,1);
+0015             
+0016             A = [A1 OA;
+0017                 OA A2];
+0018             B = [B1 OAv;
+0019                 OAv B2];
+0020             
+0021             Bu = B(:,1);
+0022             Bw = B(:,2);
+0023             
+0024             SC = SC@<a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>(A,Bu,Bw);
+0025             
+0026         <span class="keyword">end</span>
+0027         
+0028         <a name="_sub1" href="#_subfunctions" class="code">function obj = get_objective(Sys, X, Y, U)</a>
+0029             
+0030             obj = norm(X(2,1)-1,1);
+0031             <span class="keyword">for</span> k=2:2*Sys.L
+0032                 obj = obj + Sys.ts*(norm(X(2,k-1)-1,1));
+0033             <span class="keyword">end</span>
+0034             
+0035         <span class="keyword">end</span>
+0036         
+0037         
+0038     <span class="keyword">end</span>
+0039     
+0040     
+0041 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

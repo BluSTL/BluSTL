@@ -1,0 +1,14 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  hvac_room -> hvac_room;
+  hvac_room_det -> hvac_room_det;
+  init_hvac_room_data -> get_temp_bnd;
+  test_hvac_room -> hvac_room;
+  test_hvac_room -> hvac_room_det;
+
+  get_temp_bnd [URL="get_temp_bnd.html"];
+  hvac_room [URL="hvac_room.html"];
+  hvac_room_det [URL="hvac_room_det.html"];
+  init_hvac_room_data [URL="init_hvac_room_data.html"];
+  test_hvac_room [URL="test_hvac_room.html"];
+}

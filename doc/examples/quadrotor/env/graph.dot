@@ -1,0 +1,16 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  envLTL -> getNotAP;
+  envLTL -> getPoly;
+  envLTL -> mergePoly;
+  envPt2Pt -> getNotAP;
+  envPt2Pt -> getPoly;
+  envPt2Pt -> mergePoly;
+
+  envLTL [URL="envLTL.html"];
+  envPt2Pt [URL="envPt2Pt.html"];
+  getNotAP [URL="getNotAP.html"];
+  getPoly [URL="getPoly.html"];
+  mergePoly [URL="mergePoly.html"];
+  plotEnv [URL="plotEnv.html"];
+}

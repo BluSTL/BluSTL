@@ -1,0 +1,449 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of STLparse</title>
+  <meta name="keywords" content="STLparse">
+  <meta name="description" content="STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">src</a> &gt; <a href="index.html">private</a> &gt; STLparse.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src/private&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>STLparse
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function phi = STLparse(phi,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas
+
+ Synopsis: phi = STLparse(phi, phi_str)
+
+      OR : phi = STLparse(phi, unary_op, phi0)
+      OR : phi = STLparse(phi, unary_op2, interv, phi2)
+      OR : phi = STLparse(phi, binary_op, phi1, phi2)
+      OR : phi = STLparse(phi, 'until', phi1, interv, phi2)
+      OR : phi = STLparse(phi, 'andn', [phi1, phi2, ..., phin])
+
+ Inputs:
+  - phi       : is the STLformula to create
+  - phi_str   : a string describing the formula. This string must follow
+                the grammar described in the STLformula documentation
+  - phi0      : a STL Formula
+  - phi1      : a STL Formula
+  - phi2      : a STL Formula
+  - phin      : a STL Formula
+  - unary_op  : is either 'not', 'ev', 'alw', 'eventually' or 'always'
+  - unary_op2 : is either 'ev', 'alw', 'eventually' or 'always'
+  - binary_op : is either 'or', 'and' or '=&gt;'
+  - interv    : is an interval
+
+ Output:
+  - phi : a STL Formula structure</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../src/STLformula.html" class="code" title="">STLformula</a>	</li><li><a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>	STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../src/STLformula.html" class="code" title="">STLformula</a>	</li><li><a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>	STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)</a></li><li><a href="#_sub2" class="code">function [success, diag, st1, st2] = checks_parenthesis_balance(st1,st2)</a></li><li><a href="#_sub3" class="code">function success = check_par(idx_left_par, idx_right_par)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function phi = STLparse(phi,varargin)</a>
+0002 <span class="comment">%STLparse fills the field type, phi, phi1 and phi2. Note: this parser is not optimized/efficient at all, don't try it with big formulas</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Synopsis: phi = STLparse(phi, phi_str)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%      OR : phi = STLparse(phi, unary_op, phi0)</span>
+0007 <span class="comment">%      OR : phi = STLparse(phi, unary_op2, interv, phi2)</span>
+0008 <span class="comment">%      OR : phi = STLparse(phi, binary_op, phi1, phi2)</span>
+0009 <span class="comment">%      OR : phi = STLparse(phi, 'until', phi1, interv, phi2)</span>
+0010 <span class="comment">%      OR : phi = STLparse(phi, 'andn', [phi1, phi2, ..., phin])</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Inputs:</span>
+0013 <span class="comment">%  - phi       : is the STLformula to create</span>
+0014 <span class="comment">%  - phi_str   : a string describing the formula. This string must follow</span>
+0015 <span class="comment">%                the grammar described in the STLformula documentation</span>
+0016 <span class="comment">%  - phi0      : a STL Formula</span>
+0017 <span class="comment">%  - phi1      : a STL Formula</span>
+0018 <span class="comment">%  - phi2      : a STL Formula</span>
+0019 <span class="comment">%  - phin      : a STL Formula</span>
+0020 <span class="comment">%  - unary_op  : is either 'not', 'ev', 'alw', 'eventually' or 'always'</span>
+0021 <span class="comment">%  - unary_op2 : is either 'ev', 'alw', 'eventually' or 'always'</span>
+0022 <span class="comment">%  - binary_op : is either 'or', 'and' or '=&gt;'</span>
+0023 <span class="comment">%  - interv    : is an interval</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% Output:</span>
+0026 <span class="comment">%  - phi : a STL Formula structure</span>
+0027 <span class="comment">%</span>
+0028 
+0029 <span class="keyword">switch</span>(numel(varargin))
+0030     
+0031     <span class="keyword">case</span> 1 <span class="comment">% Here, the formula is defined by a string. We parse this string.</span>
+0032         <span class="keyword">if</span> ~ischar(varargin{1})
+0033             error(<span class="string">'STLformula:STLparse'</span>,<span class="string">'Invalid formula'</span>);
+0034         <span class="keyword">end</span>
+0035         
+0036         <span class="comment">% deals with true and false</span>
+0037         
+0038         st = regexprep(varargin{1}, <span class="string">'true'</span>, <span class="string">'inf&gt;0'</span>);
+0039         st = regexprep(st, <span class="string">'^\s*'</span>, <span class="string">''</span>);
+0040         st = regexprep(st, <span class="string">'false'</span>, <span class="string">'inf&lt;0'</span>);
+0041         
+0042         <span class="comment">% aliases</span>
+0043         st = regexprep(st, <span class="string">'always'</span>, <span class="string">'alw'</span>);
+0044         st = regexprep(st, <span class="string">'eventually'</span>, <span class="string">'ev'</span>);
+0045         
+0046         st = regexprep(st,<span class="string">'&lt;='</span>,<span class="string">'&lt;'</span>);
+0047         st = regexprep(st,<span class="string">'&gt;='</span>,<span class="string">'&gt;'</span>);
+0048                
+0049         <span class="comment">% test or</span>
+0050         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;or\&gt;'</span>);
+0051         <span class="keyword">if</span> success
+0052             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st1);
+0053             phi2 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'2__'</span>],st2);
+0054             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'or'</span>, phi1, phi2);
+0055             <span class="keyword">return</span>
+0056         <span class="keyword">end</span>
+0057         
+0058         <span class="comment">% test implies</span>
+0059         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;=&gt;\&gt;'</span>);
+0060         <span class="keyword">if</span> success
+0061             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st1);
+0062             phi2 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'2__'</span>],st2);
+0063             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'=&gt;'</span>, phi1, phi2);
+0064             <span class="keyword">return</span>
+0065         <span class="keyword">end</span>
+0066         
+0067         <span class="comment">% test and</span>
+0068         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;and\&gt;'</span>);
+0069         <span class="keyword">if</span> success
+0070             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st1);
+0071             phi2 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'2__'</span>],st2);
+0072             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'and'</span>, phi1, phi2);
+0073             <span class="keyword">return</span>
+0074         <span class="keyword">end</span>
+0075         
+0076         <span class="comment">% test until</span>
+0077         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;until\&gt;'</span>);
+0078         interval = <span class="string">'[0 inf]'</span>;
+0079         <span class="keyword">if</span> success
+0080             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st1);
+0081             phi2 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'2__'</span>],st2);
+0082             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'until'</span>, phi1, interval, phi2);
+0083             <span class="keyword">return</span>
+0084         <span class="keyword">end</span>
+0085         
+0086         <span class="comment">% test until_[ti,tf]</span>
+0087         [success, st1, st2, interval] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;until_\[(.+?)\]\&gt;'</span>);
+0088         <span class="keyword">if</span> success
+0089             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st1);
+0090             phi2 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'2__'</span>],st2);
+0091             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'until'</span>, phi1, interval, phi2);
+0092             <span class="keyword">return</span>
+0093         <span class="keyword">end</span>
+0094         
+0095         <span class="comment">% test eventually</span>
+0096         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;ev\&gt;'</span>);
+0097         <span class="keyword">if</span> success
+0098             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st2);
+0099             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi, <span class="string">'ev'</span>, phi1);
+0100             <span class="keyword">return</span>
+0101         <span class="keyword">end</span>
+0102         
+0103         <span class="comment">% test eventually_[ti,tf]</span>
+0104         [success, st1, st2, interval] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;ev_\[(.+?)\]\&gt;'</span>);
+0105         <span class="keyword">if</span> success
+0106             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st2);
+0107             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'ev'</span>,interval,phi1);
+0108             <span class="keyword">return</span>
+0109         <span class="keyword">end</span>
+0110 
+0111         
+0112         <span class="comment">% test always</span>
+0113         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;alw\&gt;'</span>);
+0114         <span class="keyword">if</span> success
+0115             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st2);
+0116             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi, <span class="string">'alw'</span>, phi1);
+0117             <span class="keyword">return</span>
+0118         <span class="keyword">end</span>
+0119         
+0120         <span class="comment">% test alw_[ti,tf]</span>
+0121         [success, st1, st2, interval] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;alw_\[(.+?)\]\&gt;'</span>);
+0122         <span class="keyword">if</span> success
+0123             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st2);
+0124             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi,<span class="string">'alw'</span>,interval,phi1);
+0125             <span class="keyword">return</span>
+0126         <span class="keyword">end</span>
+0127 
+0128         <span class="comment">% test not</span>
+0129         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'\&lt;not\&gt;'</span>);
+0130         <span class="keyword">if</span> success
+0131             phi1 = <a href="../../src/STLformula.html" class="code" title="">STLformula</a>([phi.id <span class="string">'1__'</span>],st2);
+0132             phi = <a href="STLparse.html" class="code" title="function phi = STLparse(phi,varargin)">STLparse</a>(phi, <span class="string">'not'</span>, phi1);
+0133             <span class="keyword">return</span>
+0134         <span class="keyword">end</span>
+0135         
+0136         <span class="comment">% test predicate</span>
+0137         
+0138         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'&lt;'</span>);
+0139         <span class="keyword">if</span> success
+0140             phi.type=<span class="string">'predicate'</span>;
+0141             phi.st = [ st1 <span class="string">'&lt;'</span> st2 ];
+0142             <span class="keyword">return</span>
+0143         <span class="keyword">end</span>
+0144         
+0145         [success, st1, st2] = <a href="#_sub1" class="code" title="subfunction [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)">parenthesisly_balanced_split</a>(st, <span class="string">'&gt;'</span>);
+0146         <span class="keyword">if</span> success
+0147             phi.type = <span class="string">'predicate'</span>;
+0148             phi.st = [ st1 <span class="string">'&gt;'</span> st2 ];
+0149             <span class="keyword">return</span>
+0150         <span class="keyword">end</span>
+0151         
+0152         <span class="comment">% Last possibility, the formula already exists</span>
+0153         
+0154         <span class="keyword">try</span>
+0155             id = phi.id;
+0156             phi = struct(evalin(<span class="string">'base'</span>, st));
+0157             phi.id = id;
+0158         <span class="keyword">catch</span>
+0159             error(<span class="string">'STLformula:STLparse'</span>,[<span class="string">'Unknown or ill-formed predicate or subformula: '</span> st]);
+0160         <span class="keyword">end</span>
+0161         
+0162     <span class="keyword">case</span> 2
+0163         <span class="keyword">switch</span>(varargin{1})
+0164             <span class="keyword">case</span> <span class="string">'not'</span>
+0165                 phi.type = <span class="string">'not'</span>;
+0166                 phi.phi = varargin{2};
+0167                 
+0168             <span class="keyword">case</span> <span class="string">'ev'</span>
+0169                 phi.type = <span class="string">'eventually'</span>;
+0170                 phi.phi = varargin{2};
+0171                 phi.interval = <span class="string">'[0 inf]'</span>;
+0172                 
+0173             <span class="keyword">case</span> <span class="string">'alw'</span>
+0174                 phi.type = <span class="string">'always'</span> ;
+0175                 phi.phi = varargin{2};
+0176                 phi.interval = <span class="string">'[0 inf]'</span>;
+0177                 
+0178             <span class="keyword">otherwise</span>
+0179                 phi.st = varargin{1};
+0180                 phi.type = <span class="string">'predicate'</span>;
+0181         <span class="keyword">end</span>
+0182         
+0183     <span class="keyword">case</span> 3
+0184         <span class="keyword">switch</span>(varargin{1})
+0185             <span class="keyword">case</span> <span class="string">'or'</span>
+0186                 phi.type = <span class="string">'or'</span> ;
+0187                 phi.phi1 = varargin{2};
+0188                 phi.phi2 = varargin{3};
+0189                 
+0190             <span class="keyword">case</span> <span class="string">'and'</span>
+0191                 phi.type = <span class="string">'and'</span>;
+0192                 phi.phi1 = varargin{2};
+0193                 phi.phi2 = varargin{3};
+0194                 
+0195             <span class="keyword">case</span> <span class="string">'=&gt;'</span>
+0196                 phi.type = <span class="string">'=&gt;'</span>;
+0197                 phi.phi1 = varargin{2};
+0198                 phi.phi2 = varargin{3};
+0199                 
+0200             <span class="keyword">case</span> <span class="string">'ev'</span>
+0201                 phi.type = <span class="string">'eventually'</span> ;
+0202                 phi.interval = varargin{2};
+0203                 phi.phi = varargin{3};
+0204                 
+0205             <span class="keyword">case</span> <span class="string">'alw'</span>
+0206                 phi.type = <span class="string">'always'</span> ;
+0207                 phi.interval = varargin{2};
+0208                 phi.phi = varargin{3};
+0209         <span class="keyword">end</span>
+0210         
+0211     <span class="keyword">case</span> 4
+0212         <span class="keyword">switch</span>(varargin{1})
+0213             <span class="keyword">case</span> <span class="string">'until'</span>
+0214                 phi.type = <span class="string">'until'</span> ;
+0215                 phi.interval =  varargin{3};
+0216                 phi.phi1 = varargin{2};
+0217                 phi.phi2 = varargin{4};
+0218         <span class="keyword">end</span>
+0219     <span class="keyword">otherwise</span>
+0220         error(<span class="string">'STLformula:STLparse'</span>,<span class="string">'Too many arguments.'</span>)
+0221 <span class="keyword">end</span>
+0222 
+0223 <span class="keyword">end</span>
+0224 
+0225 <a name="_sub1" href="#_subfunctions" class="code">function [success, st1, st2, interval] = parenthesisly_balanced_split(st, op, int)</a>
+0226 
+0227 <span class="comment">% split st into st1 op st2 where st1 and st2 are parenthesisly balanced</span>
+0228 success = 0;
+0229 st1 = <span class="string">''</span>;
+0230 st2 = <span class="string">''</span>;
+0231 interval =<span class="string">''</span>;
+0232 
+0233 [start_idx, end_idx, ~, ~, tokens] = regexp(st,op);
+0234 
+0235 <span class="keyword">for</span> i = 1:numel(start_idx)
+0236     
+0237     <span class="comment">% checks left hand side</span>
+0238     st1 = st(1:start_idx(i)-1);
+0239     st2 = st(end_idx(i)+1:end);
+0240     
+0241     [success, diag, st1, st2] = <a href="#_sub2" class="code" title="subfunction [success, diag, st1, st2] = checks_parenthesis_balance(st1,st2)">checks_parenthesis_balance</a>(st1,st2);
+0242     <span class="keyword">if</span> success==-1
+0243         error([<span class="string">'STLparse: expression '</span> st <span class="string">':'</span> diag]);
+0244     <span class="keyword">elseif</span> success==1
+0245       <span class="keyword">if</span> nargout == 4
+0246         interval= [<span class="string">'['</span> tokens{i}{1} <span class="string">']'</span>];
+0247       <span class="keyword">end</span>
+0248       <span class="keyword">return</span>
+0249     <span class="keyword">end</span>
+0250 <span class="keyword">end</span>
+0251 
+0252 <span class="keyword">end</span>
+0253 
+0254 <a name="_sub2" href="#_subfunctions" class="code">function [success, diag, st1, st2] = checks_parenthesis_balance(st1,st2)</a>
+0255 
+0256 success=0;
+0257 diag = <span class="string">''</span>;
+0258 
+0259 <span class="comment">% finds parenthesis</span>
+0260 idx_left_par1 = regexp(st1,<span class="string">'('</span>);
+0261 idx_right_par1 = regexp(st1,<span class="string">')'</span>);
+0262 
+0263 nb_left_par1 = numel(idx_left_par1);
+0264 nb_right_par1 = numel(idx_right_par1);
+0265 
+0266 idx_left_par2 = regexp(st2,<span class="string">'('</span>);
+0267 idx_right_par2 = regexp(st2,<span class="string">')'</span>);
+0268 
+0269 nb_left_par2 = numel(idx_left_par2);
+0270 nb_right_par2 = numel(idx_right_par2);
+0271 
+0272 <span class="comment">% first sanity check: equal total number of ( and )</span>
+0273 
+0274 diff_par = (nb_left_par1+nb_left_par2) - (nb_right_par1+nb_right_par2);
+0275 <span class="keyword">if</span> (diff_par&gt;0)
+0276     diag=sprintf(<span class="string">'Too many (%d) opening parenthesis in expr'</span>, diff_par);
+0277     success=-1;
+0278     <span class="keyword">return</span>;
+0279 <span class="keyword">elseif</span> (diff_par&lt;0)
+0280     diag=sprintf(<span class="string">'Too many (%d) closing parenthesis in expr'</span>, -diff_par);
+0281     success=-1; 
+0282     <span class="keyword">return</span>;
+0283 <span class="keyword">end</span>
+0284 
+0285 <span class="comment">% checks parenthesis for st1</span>
+0286 
+0287 <span class="comment">% first check/remove enclosing parenthesis: we should have (*par_exp where par exp is balanced</span>
+0288 <span class="comment">% so we check the difference in the number of left and right, if more right, then problem</span>
+0289 
+0290 diff1 = nb_left_par1- nb_right_par1; <span class="comment">% from previous check, diff2 = -diff1</span>
+0291 
+0292 <span class="keyword">if</span> (diff1 ~=0)
+0293     <span class="keyword">if</span> (diff1&lt;0)
+0294         success=0;
+0295         <span class="keyword">return</span>;
+0296     <span class="keyword">else</span> <span class="comment">% alright, so diff1&gt;0 should be the number of enclosing parenthesis</span>
+0297         <span class="comment">% we remove them</span>
+0298         
+0299         <span class="comment">% checks if there is nothing but blanks before enclosing par.</span>
+0300         pre_st1 = st1(1:idx_left_par1(diff1));  
+0301         <span class="keyword">if</span> ~isempty(regexp(pre_st1, <span class="string">'[^\(\s]'</span>)) 
+0302             success= 0;
+0303             <span class="keyword">return</span>;
+0304         <span class="keyword">end</span>
+0305         
+0306         <span class="comment">% checks if there is nothing but blanks after enclosing par.</span>
+0307         post_st2 = st2(idx_right_par2(end-diff1+1):end);  
+0308         <span class="keyword">if</span> ~isempty(regexp(post_st2, <span class="string">'[^\)\s]'</span>)) 
+0309             success= 0;
+0310             <span class="keyword">return</span>;
+0311         <span class="keyword">end</span>
+0312 
+0313         st1 = st1(1+idx_left_par1(diff1):end);
+0314         idx_left_par1 = idx_left_par1(1+diff1:end);
+0315         
+0316         st2 = st2(1:idx_right_par2(end-diff1+1)-1);
+0317         idx_right_par2 = idx_right_par2(1:end-diff1);
+0318       
+0319     <span class="keyword">end</span>
+0320 <span class="keyword">end</span>    
+0321     <span class="comment">% At this point, no enclosing parenthesis any more, st1 and st2 should be balanced</span>
+0322     success = <a href="#_sub3" class="code" title="subfunction success = check_par(idx_left_par, idx_right_par)">check_par</a>(idx_left_par1, idx_right_par1) &amp;&amp; <a href="#_sub3" class="code" title="subfunction success = check_par(idx_left_par, idx_right_par)">check_par</a>(idx_left_par2, idx_right_par2);
+0323 <span class="keyword">end</span>
+0324 
+0325 
+0326 <a name="_sub3" href="#_subfunctions" class="code">function success = check_par(idx_left_par, idx_right_par)</a>
+0327 
+0328 <span class="comment">% idx_left_par and idx_right_par have same number of elements</span>
+0329 
+0330 assert(numel(idx_left_par) == numel(idx_right_par));
+0331 counter = 0;
+0332 
+0333 <span class="comment">%read stuff; +1 if left par, -1 if right. Whenever counter&lt;0 exit with success==0</span>
+0334 lcount =1;
+0335 rcount =1;
+0336 nb_par = numel(idx_left_par);
+0337 
+0338 <span class="keyword">while</span> (1)
+0339 
+0340     <span class="comment">% no more left or right par.</span>
+0341     <span class="keyword">if</span> (lcount &gt; nb_par) &amp;&amp; (rcount&gt;nb_par)
+0342         <span class="keyword">break</span>;
+0343     <span class="keyword">end</span>
+0344     
+0345     <span class="keyword">if</span> (lcount &gt; nb_par) <span class="comment">% no more left, add one right</span>
+0346         counter = counter-1;
+0347         rcount = rcount+1;
+0348     <span class="keyword">elseif</span> (rcount &gt; nb_par) <span class="comment">% no more right, add one left</span>
+0349         counter=counter+1;
+0350         lcount=lcount+1;
+0351     <span class="keyword">else</span> <span class="comment">% still some left and right parenthesis</span>
+0352         
+0353         next_lp = idx_left_par(lcount);
+0354         next_rp = idx_right_par(rcount);
+0355         <span class="keyword">if</span> (next_lp&lt;next_rp) <span class="comment">% next par is left, add left</span>
+0356             counter=counter+1;
+0357             lcount=lcount+1;
+0358         <span class="keyword">else</span> <span class="comment">% next par is right, add right</span>
+0359             counter=counter-1;
+0360             rcount=rcount+1;
+0361         <span class="keyword">end</span>
+0362     <span class="keyword">end</span>
+0363     
+0364     <span class="comment">% if count went neg, no success</span>
+0365     <span class="keyword">if</span> counter&lt;0
+0366         <span class="keyword">break</span>;
+0367     <span class="keyword">end</span>
+0368     
+0369 <span class="keyword">end</span>
+0370 
+0371 success = (counter==0); <span class="comment">% meaning all left par have been consumed by right par</span>
+0372 
+0373 
+0374 <span class="keyword">end</span>
+0375 
+0376</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of test_signal_generator</title>
+  <meta name="keywords" content="test_signal_generator">
+  <meta name="description" content="% Create the system">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">examples</a> &gt; <a href="index.html">signal_generator</a> &gt; test_signal_generator.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for examples/signal_generator&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>test_signal_generator
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>% Create the system</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% Create the system</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% Create the system</span>
+0002 nu = 2;
+0003 
+0004 A = [-1 0 ;
+0005      0 -1];
+0006 B = eye(nu);
+0007 C = eye(nu);
+0008 D = [];
+0009 
+0010 SG= <a href="../../src/STLC_lti.html" class="code" title="">STLC_lti</a>(A,B,C,D); 
+0011 SG.x0= [0 ; 0];
+0012 
+0013 <span class="comment">%% Controller Initialisation</span>
+0014 <span class="comment">% Time</span>
+0015 SG.time = 0:1:100; <span class="comment">% time for the dynamics</span>
+0016 SG.ts=1; <span class="comment">% sampling time for controller</span>
+0017 SG.L=30;  <span class="comment">% horizon (# of steps)</span>
+0018 SG.nb_stages=1; <span class="comment">% repeats time</span>
+0019 
+0020 <span class="comment">% Bounds</span>
+0021 SG.u_ub(:) = 10;
+0022 SG.u_lb(:) = -10;
+0023 
+0024 <span class="comment">%% STL formula</span>
+0025 
+0026 SG.stl_list = {<span class="string">'alw_[10,20] (y1(t) &gt; 5 and y2(t)&lt;-2)'</span>};
+0027 SG.min_rob = 0.01;    
+0028 SG.bigM = 1000;
+0029 
+0030 <span class="comment">%% Initial state</span>
+0031 
+0032 <span class="comment">%return;</span>
+0033 <span class="comment">%% running stuff</span>
+0034 fprintf(<span class="string">'Computing controller...'</span>);
+0035 tic;
+0036 controller = get_controller(SG)
+0037 toc;
+0038 run_open_loop(SG, controller);</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

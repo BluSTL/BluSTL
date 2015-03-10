@@ -111,8 +111,10 @@ while (time_d(end)+ts< time(end))
     update_controller_data();
     
     %% compute input for the next horizon
-    compute_input();
     
+    tic;
+    compute_input();
+    toc;
     %% update states
     u_new = Upred(:,i_transient);
     w_new = compute_w();

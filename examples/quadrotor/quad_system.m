@@ -1,9 +1,7 @@
 classdef quad_system < STLC_lti
     
     properties 
-    
         env
-        controller
     end
     
     

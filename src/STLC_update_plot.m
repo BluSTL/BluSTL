@@ -15,7 +15,7 @@ if isempty(Sys.h)
     for iX = Sys.plot_x
         subplot(nb_plots,1,cur_plot);
         hold on; grid on;
-        Sys.h.Xpast(iX) = plot(Sys.system_data.time, Sys.system_data.X(iX,:));
+        Sys.h.Xpast(iX) = plot(Sys.system_data.time, Sys.system_data.X(iX,1:end-1));
         Sys.h.Xmodel(iX) = plot(Sys.model_data.time,Sys.model_data.X(iX,:), '--r');
         ylabel(Sys.xlabel{iX});
         cur_plot = cur_plot+1;
@@ -33,7 +33,7 @@ if isempty(Sys.h)
     for iU = Sys.plot_u
         subplot(nb_plots,1,cur_plot);
         hold on;grid on;
-        Sys.h.Upast(iU) = stairs(Sys.system_data.time(1:end-1), Sys.system_data.U(iU,:));
+        Sys.h.Upast(iU) = stairs(Sys.system_data.time, Sys.system_data.U(iU,:));
         Sys.h.Umodel(iU) = stairs(Sys.model_data.time(1:end-1),Sys.model_data.U(iU,:), '--r');
         ylabel([Sys.ulabel{iU}]);
         cur_plot = cur_plot+1;
@@ -55,17 +55,17 @@ if isempty(Sys.h)
 else
     
     for iX = Sys.plot_x
-        set(Sys.h.Xpast(iX), 'Xdata', Sys.system_data.time, 'Ydata',Sys.system_data.X(iX,:));
+        set(Sys.h.Xpast(iX), 'Xdata', Sys.system_data.time, 'Ydata',Sys.system_data.X(iX,1:end-1));
         set(Sys.h.Xmodel(iX), 'Xdata', Sys.model_data.time,'Ydata', Sys.model_data.X(iX,:));
     end
     
     for iY = Sys.plot_y
-        set(Sys.h.Ypast(iY), 'Xdata', Sys.system_data.time(1:end-1),'Ydata',  Sys.system_data.Y(iY,:));
+        set(Sys.h.Ypast(iY), 'Xdata', Sys.system_data.time,'Ydata',  Sys.system_data.Y(iY,:));
         set(Sys.h.Ymodel(iY), 'Xdata', Sys.model_data.time(1:end-1),'Ydata', Sys.model_data.Y(iY,:));
     end
     
     for iU = Sys.plot_u
-        set(Sys.h.Upast(iU), 'Xdata', Sys.system_data.time(1:end-1),'Ydata',  Sys.system_data.U(iU,:));
+        set(Sys.h.Upast(iU), 'Xdata', Sys.system_data.time,'Ydata',  Sys.system_data.U(iU,:));
         set(Sys.h.Umodel(iU), 'Xdata', Sys.model_data.time(1:end-1),'Ydata', Sys.model_data.U(iU,:));
     end
     

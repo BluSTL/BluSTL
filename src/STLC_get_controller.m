@@ -52,7 +52,7 @@ M = Sys.bigM;
 Pphi=sdpvar(1,1);
 for i = 1:numel(stl_list)
     phi = STLformula('phi', stl_list{i});
-    [Fphi, Pphi] = STL2MILP_robust(phi,1, 2*L, ts, var,M); 
+    [Fphi, Pphi] = STL2MILP_robust(phi, 2*L, ts, var,M); 
     Fstl = [Fstl Fphi];
     for j = 1:min(L, size(Pphi,2))
         Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...

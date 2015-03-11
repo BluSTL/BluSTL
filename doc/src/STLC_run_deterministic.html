@@ -4,7 +4,7 @@
 <head>
   <title>Description of STLC_run_deterministic</title>
   <meta name="keywords" content="STLC_run_deterministic">
-  <meta name="description" content="">
+  <meta name="description" content="STLC_run_deterministic    runs a receding horizon control problem">
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
   <meta name="robots" content="index, follow">
@@ -21,16 +21,28 @@
 </h1>
 
 <h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="box"><strong></strong></div>
+<div class="box"><strong>STLC_run_deterministic    runs a receding horizon control problem</strong></div>
 
 <h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 <div class="box"><strong>function [Sys, params] = STLC_run_deterministic(Sys, controller) </strong></div>
 
 <h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="fragment"><pre class="comment">
- run_deterministic
+<div class="fragment"><pre class="comment"> STLC_run_deterministic    runs a receding horizon control problem 
+                           for the system described by Sys, using the
+                           provided controller optimizer object, using the 
+                           horizon defined by Sys.L
+                           
+ Input: 
+       Sys: an STLC_lti instance
+       controller: a YALMIP opmitizer object representing the system's 
+                   optimization problem
 
-  Output: hist_data, params (controller data)</pre></div>
+ Output: 
+       Sys: modified with additional system_data
+       params: controller data
+
+ :copyright: TBD
+ :license: TBD</pre></div>
 
 <!-- crossreference -->
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
@@ -48,210 +60,221 @@ This function is called by:
 
 <h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 <div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Sys, params] = STLC_run_deterministic(Sys, controller)</a>
-0002 <span class="comment">%</span>
-0003 <span class="comment">% run_deterministic</span>
-0004 <span class="comment">%</span>
-0005 <span class="comment">%  Output: hist_data, params (controller data)</span>
+0002 <span class="comment">% STLC_run_deterministic    runs a receding horizon control problem</span>
+0003 <span class="comment">%                           for the system described by Sys, using the</span>
+0004 <span class="comment">%                           provided controller optimizer object, using the</span>
+0005 <span class="comment">%                           horizon defined by Sys.L</span>
 0006 <span class="comment">%</span>
-0007 <span class="comment">%</span>
-0008 <span class="keyword">global</span> StopRequest
-0009 StopRequest=0;
-0010 
-0011 rob = Sys.min_rob;
-0012 
-0013 <span class="comment">%% Time</span>
-0014 sys = Sys.sys;
-0015 ts=Sys.ts; <span class="comment">% sampling time</span>
-0016 L=Sys.L;  <span class="comment">% horizon (# of steps)</span>
-0017 time = Sys.time; <span class="comment">% time for the date</span>
-0018 time_d = (0:2*L-1)*ts; <span class="comment">% discretized time for the controller</span>
-0019 
-0020 <span class="comment">%% System dimensions and variables</span>
-0021 Sys.sysd = c2d(sys,ts);
-0022 
-0023 x0 = Sys.x0;
-0024 nu=Sys.nu;
-0025 nx=Sys.nx;
-0026 nw=Sys.nw;
-0027 ny=Sys.ny;
-0028 
-0029 <span class="comment">% reference disturbance</span>
-0030 <span class="keyword">if</span> isempty(Sys.Wref)
-0031     Sys.Wref = 0*time;
-0032 <span class="keyword">end</span>
-0033 Wref = Sys.Wref;
-0034 <span class="keyword">for</span> iwx=1:nw
-0035     Wn(iwx,:) = interp1( time , Wref(iwx,:)', time_d)';
-0036 <span class="keyword">end</span>
-0037 
-0038 
-0039 <span class="comment">%% Make data nb_stages times longer</span>
-0040 nb_stages=Sys.nb_stages;
-0041 ntime = zeros(1, nb_stages*numel(time));
-0042 <span class="keyword">for</span> istage = 0:nb_stages-1
-0043     ntime(istage*numel(time)+1:(istage+1)*numel(time))= time+istage*(time(end)+time(2)) ;
-0044 <span class="keyword">end</span>
-0045 time = ntime;
-0046 Wref = repmat(Wref,1,Sys.nb_stages);
-0047 
+0007 <span class="comment">% Input:</span>
+0008 <span class="comment">%       Sys: an STLC_lti instance</span>
+0009 <span class="comment">%       controller: a YALMIP opmitizer object representing the system's</span>
+0010 <span class="comment">%                   optimization problem</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Output:</span>
+0013 <span class="comment">%       Sys: modified with additional system_data</span>
+0014 <span class="comment">%       params: controller data</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% :copyright: TBD</span>
+0017 <span class="comment">% :license: TBD</span>
+0018 
+0019 <span class="keyword">global</span> StopRequest
+0020 StopRequest=0;
+0021 
+0022 rob = Sys.min_rob;
+0023 
+0024 <span class="comment">%% Time</span>
+0025 sys = Sys.sys;
+0026 ts=Sys.ts; <span class="comment">% sampling time</span>
+0027 L=Sys.L;  <span class="comment">% horizon (# of steps)</span>
+0028 time = Sys.time; <span class="comment">% time for the date</span>
+0029 time_d = (0:2*L-1)*ts; <span class="comment">% discretized time for the controller</span>
+0030 
+0031 <span class="comment">%% System dimensions and variables</span>
+0032 Sys.sysd = c2d(sys,ts);
+0033 
+0034 x0 = Sys.x0;
+0035 nu=Sys.nu;
+0036 nx=Sys.nx;
+0037 nw=Sys.nw;
+0038 ny=Sys.ny;
+0039 
+0040 <span class="comment">% reference disturbance</span>
+0041 <span class="keyword">if</span> isempty(Sys.Wref)
+0042     Sys.Wref = 0*time;
+0043 <span class="keyword">end</span>
+0044 Wref = Sys.Wref;
+0045 <span class="keyword">for</span> iwx=1:nw
+0046     Wn(iwx,:) = interp1( time , Wref(iwx,:)', time_d)';
+0047 <span class="keyword">end</span>
 0048 
-0049 <span class="comment">%%  Solving for the first horizon L</span>
-0050 M = Sys.bigM; <span class="comment">% big M</span>
-0051 
-0052 <span class="comment">% Initialize discrete data for the controller and environment</span>
-0053 
-0054 donen = zeros(1,2*L-1); <span class="comment">% done(1:k) = 1 iff everything has been computed up to step k</span>
-0055 pn = -1*M*ones(1,L);    <span class="comment">% for activating robustness constraints</span>
-0056 Un = zeros(nu,2*L-1);
-0057 Xn = zeros(max(nx,1),2*L);
-0058 <span class="keyword">if</span> (nx&gt;0)
-0059     Xn(:,1) = x0;           <span class="comment">% only X0 is already computed</span>
-0060 <span class="keyword">end</span>
-0061 pn(1) = rob;
+0049 
+0050 <span class="comment">%% Make data nb_stages times longer</span>
+0051 nb_stages=Sys.nb_stages;
+0052 ntime = zeros(1, nb_stages*numel(time));
+0053 <span class="keyword">for</span> istage = 0:nb_stages-1
+0054     ntime(istage*numel(time)+1:(istage+1)*numel(time))= time+istage*(time(end)+time(2)) ;
+0055 <span class="keyword">end</span>
+0056 time = ntime;
+0057 Wref = repmat(Wref,1,Sys.nb_stages);
+0058 
+0059 
+0060 <span class="comment">%%  Solving for the first horizon L</span>
+0061 M = Sys.bigM; <span class="comment">% big M</span>
 0062 
-0063 Upred = zeros(nu,2*L-1);
-0064 Xpred = zeros(nx,2*L);
-0065 
-0066 u_new = [];
-0067 w_new = [];
-0068 x_new = [];
-0069 y_new = [];
-0070 time_new = 0;
-0071 params = {};
-0072 
-0073 <span class="comment">% call solver for the first horizon</span>
-0074 i_transient=1;
-0075 i_past = 1;
+0063 <span class="comment">% Initialize discrete data for the controller and environment</span>
+0064 
+0065 donen = zeros(1,2*L-1); <span class="comment">% done(1:k) = 1 iff everything has been computed up to step k</span>
+0066 pn = -1*M*ones(1,L);    <span class="comment">% for activating robustness constraints</span>
+0067 Un = zeros(nu,2*L-1);
+0068 Xn = zeros(max(nx,1),2*L);
+0069 <span class="keyword">if</span> (nx&gt;0)
+0070     Xn(:,1) = x0;           <span class="comment">% only X0 is already computed</span>
+0071 <span class="keyword">end</span>
+0072 pn(1) = rob;
+0073 
+0074 Upred = zeros(nu,2*L-1);
+0075 Xpred = zeros(nx,2*L);
 0076 
-0077 <span class="comment">%% Init system and model data</span>
-0078 Sys.system_data=struct;
-0079 Sys.model_data=struct;
-0080 
-0081 Sys.system_data.time = [];
-0082 Sys.system_data.U = [];
-0083 Sys.system_data.X = x0;
-0084 Sys.system_data.Y = [];
-0085 Sys.system_data.W = [];
-0086 
-0087 Sys.model_data.time = time_d;
-0088 Sys.model_data.X = repmat(0*time_d(1:end), [nx 1]);
-0089 Sys.model_data.Y = repmat(0*time_d(1:end-1), [ny 1]);
-0090 Sys.model_data.U = repmat(0*time_d(1:end-1), [nu 1]);
-0091 Sys.model_data.W = Wn;
-0092 
-0093 <a href="#_sub1" class="code" title="subfunction compute_input()">compute_input</a>();
-0094         
-0095 time_new = 0;
-0096 u_new = Upred(:,i_transient);
-0097 w_new = Wn(:,i_transient);
-0098 [x_new, y_new] = <a href="../examples/quadrotor/system_step.html" class="code" title="function x1 = system_step(sysd, x0, u0, w0)">system_step</a>(Sys, x0, u_new, w_new);
-0099 i_past =  i_past+1;
-0100 params{end+1} = {i_transient,time_d,donen,pn,Xn,Un,Wn};
-0101 
-0102 <a href="#_sub2" class="code" title="subfunction update_hist_data()">update_hist_data</a>();
-0103 Sys = update_plot(Sys);
-0104 
-0105 <span class="comment">%% loop</span>
-0106 pause
-0107 i_transient = i_transient+1;
-0108 <span class="keyword">while</span> (time_d(end)+ts&lt; time(end))
-0109     <span class="comment">% pause;</span>
-0110     x0 = x_new;
-0111     time_new = time_new+ts;
-0112     
-0113     <span class="comment">%% updates the model of controller and environment for the next horizon</span>
-0114     <a href="#_sub3" class="code" title="subfunction update_controller_data()">update_controller_data</a>();
-0115     
-0116     <span class="comment">%% compute input for the next horizon</span>
-0117     <a href="#_sub1" class="code" title="subfunction compute_input()">compute_input</a>();
-0118     
-0119     <span class="comment">%% update state</span>
-0120     u_new = Upred(:,i_transient);
-0121     w_new = Wn(:,i_transient);
-0122     [x_new, y_new] = <a href="../examples/quadrotor/system_step.html" class="code" title="function x1 = system_step(sysd, x0, u0, w0)">system_step</a>(Sys, x0, u_new, w_new);
-0123     i_past =  i_past+1;
-0124     params{end+1} = {i_transient,time_d,donen,pn,Xn,Un,Wn};
-0125 
-0126     <span class="comment">%% Update plots</span>
-0127     <a href="#_sub2" class="code" title="subfunction update_hist_data()">update_hist_data</a>();
-0128     Sys= update_plot(Sys);
+0077 u_new = [];
+0078 w_new = [];
+0079 x_new = [];
+0080 y_new = [];
+0081 time_new = 0;
+0082 params = {};
+0083 
+0084 <span class="comment">% call solver for the first horizon</span>
+0085 i_transient=1;
+0086 i_past = 1;
+0087 
+0088 <span class="comment">%% Init system and model data</span>
+0089 Sys.system_data=struct;
+0090 Sys.model_data=struct;
+0091 
+0092 Sys.system_data.time = [];
+0093 Sys.system_data.U = [];
+0094 Sys.system_data.X = x0;
+0095 Sys.system_data.Y = [];
+0096 Sys.system_data.W = [];
+0097 
+0098 Sys.model_data.time = time_d;
+0099 Sys.model_data.X = repmat(0*time_d(1:end), [nx 1]);
+0100 Sys.model_data.Y = repmat(0*time_d(1:end-1), [ny 1]);
+0101 Sys.model_data.U = repmat(0*time_d(1:end-1), [nu 1]);
+0102 Sys.model_data.W = Wn;
+0103 
+0104 <a href="#_sub1" class="code" title="subfunction compute_input()">compute_input</a>();
+0105         
+0106 time_new = 0;
+0107 u_new = Upred(:,i_transient);
+0108 w_new = Wn(:,i_transient);
+0109 [x_new, y_new] = <a href="../examples/quadrotor/system_step.html" class="code" title="function x1 = system_step(sysd, x0, u0, w0)">system_step</a>(Sys, x0, u_new, w_new);
+0110 i_past =  i_past+1;
+0111 params{end+1} = {i_transient,time_d,donen,pn,Xn,Un,Wn};
+0112 
+0113 <a href="#_sub2" class="code" title="subfunction update_hist_data()">update_hist_data</a>();
+0114 Sys = update_plot(Sys);
+0115 
+0116 <span class="comment">%% loop</span>
+0117 pause
+0118 i_transient = i_transient+1;
+0119 <span class="keyword">while</span> (time_d(end)+ts&lt; time(end))
+0120     <span class="comment">% pause;</span>
+0121     x0 = x_new;
+0122     time_new = time_new+ts;
+0123     
+0124     <span class="comment">%% updates the model of controller and environment for the next horizon</span>
+0125     <a href="#_sub3" class="code" title="subfunction update_controller_data()">update_controller_data</a>();
+0126     
+0127     <span class="comment">%% compute input for the next horizon</span>
+0128     <a href="#_sub1" class="code" title="subfunction compute_input()">compute_input</a>();
 0129     
-0130     <span class="keyword">if</span> i_transient &lt; L
-0131         i_transient = i_transient+1;
-0132     <span class="keyword">end</span>
-0133     drawnow;
-0134     <span class="comment">%   pause;</span>
-0135     <span class="keyword">if</span> StopRequest
-0136         <span class="keyword">break</span>;
-0137     <span class="keyword">end</span>
-0138 <span class="keyword">end</span>
-0139 
-0140     <a name="_sub1" href="#_subfunctions" class="code">function compute_input()</a>
-0141         [sol_control, errorflag1] = controller{{donen,pn,Xn,Un,Wn}};
-0142         <span class="keyword">if</span>(errorflag1==0)  <span class="comment">% found a good control</span>
-0143             <span class="comment">%disp(['Yalmip: ' yalmiperror(errorflag1)])</span>
-0144             Upred = sol_control{1};
-0145             Xpred = sol_control{2};
-0146         <span class="keyword">elseif</span> (errorflag1==1 || errorflag1==15||errorflag1==12)  <span class="comment">% some error, infeasibility or else</span>
-0147             disp([<span class="string">'Yalmip error (disturbance too bad ?): '</span> yalmiperror(errorflag1)]); <span class="comment">% probably there is no controller for this w</span>
-0148             StopRequest=1;
-0149         <span class="keyword">else</span>
-0150             disp([<span class="string">'Yalmip error: '</span> yalmiperror(errorflag1)]); <span class="comment">% some other error</span>
-0151         <span class="keyword">end</span>        
-0152     <span class="keyword">end</span>
-0153 
-0154     <a name="_sub2" href="#_subfunctions" class="code">function update_hist_data()</a>
-0155         
-0156         Sys.system_data.time(end+1) = time_new;
-0157         Sys.system_data.U(:,end+1) = u_new;
-0158         Sys.system_data.X(:,end+1) = x_new;
-0159         Sys.system_data.Y(:,end+1) = y_new;
-0160         Sys.system_data.W(:,end+1) = w_new;
-0161         
-0162         Sys.model_data.time = time_d;
-0163         Sys.model_data.X = double(Xpred);
-0164         Sys.model_data.Y = [Sys.sysd.C*double(Xpred(:,1:end-1)) + Sys.sysd.D*[double(Upred); double(Wn(:,1:end-1))]];
-0165         Sys.model_data.U = double(Upred);
-0166         Sys.model_data.W = Wn;
-0167         
-0168     <span class="keyword">end</span>
-0169 
-0170     <a name="_sub3" href="#_subfunctions" class="code">function update_controller_data()</a>
-0171         
-0172         <span class="keyword">if</span> (i_past&gt;= L+1)
-0173             time_d = time_d+ts; <span class="comment">% move forward one time step</span>
-0174         <span class="keyword">end</span>
-0175         
-0176         <span class="keyword">if</span> i_transient&lt;L
-0177             donen(1:i_transient-1) = 1;  <span class="comment">% we reuse what has been computed at the previous step</span>
-0178             Un(:,1:i_transient-1) = Sys.system_data.U(:,1:i_transient-1); <span class="comment">%  previously computed inputs</span>
-0179             Xn(:,1:i_transient) = Sys.system_data.X(:, 1:i_transient);
-0180             pn(i_transient) = rob;
-0181         <span class="keyword">else</span>
-0182             pn(1:L) = rob*ones(1,L);
-0183             donen(1:L-1) = 1;
-0184             Un(:,1:L-1) = Sys.system_data.U(:,end-L+2:end);     <span class="comment">%    previously computed inputs</span>
-0185             Xn(:,1:L) =   Sys.system_data.X(:,end-L+1:end);     <span class="comment">%    previously computed temperatures</span>
-0186         <span class="keyword">end</span>
-0187         
-0188         <span class="keyword">if</span> nw&gt;1
-0189             <span class="keyword">for</span> wx=1:nw
-0190                 Wn(wx,:) = interp1( time , Wref(wx,:)', time_d)';
-0191             <span class="keyword">end</span>
+0130     <span class="comment">%% update state</span>
+0131     u_new = Upred(:,i_transient);
+0132     w_new = Wn(:,i_transient);
+0133     [x_new, y_new] = <a href="../examples/quadrotor/system_step.html" class="code" title="function x1 = system_step(sysd, x0, u0, w0)">system_step</a>(Sys, x0, u_new, w_new);
+0134     i_past =  i_past+1;
+0135     params{end+1} = {i_transient,time_d,donen,pn,Xn,Un,Wn};
+0136 
+0137     <span class="comment">%% Update plots</span>
+0138     <a href="#_sub2" class="code" title="subfunction update_hist_data()">update_hist_data</a>();
+0139     Sys= update_plot(Sys);
+0140     
+0141     <span class="keyword">if</span> i_transient &lt; L
+0142         i_transient = i_transient+1;
+0143     <span class="keyword">end</span>
+0144     drawnow;
+0145     <span class="comment">%   pause;</span>
+0146     <span class="keyword">if</span> StopRequest
+0147         <span class="keyword">break</span>;
+0148     <span class="keyword">end</span>
+0149 <span class="keyword">end</span>
+0150 
+0151     <a name="_sub1" href="#_subfunctions" class="code">function compute_input()</a>
+0152         [sol_control, errorflag1] = controller{{donen,pn,Xn,Un,Wn}};
+0153         <span class="keyword">if</span>(errorflag1==0)  <span class="comment">% found a good control</span>
+0154             <span class="comment">%disp(['Yalmip: ' yalmiperror(errorflag1)])</span>
+0155             Upred = sol_control{1};
+0156             Xpred = sol_control{2};
+0157         <span class="keyword">elseif</span> (errorflag1==1 || errorflag1==15||errorflag1==12)  <span class="comment">% some error, infeasibility or else</span>
+0158             disp([<span class="string">'Yalmip error (disturbance too bad ?): '</span> yalmiperror(errorflag1)]); <span class="comment">% probably there is no controller for this w</span>
+0159             StopRequest=1;
+0160         <span class="keyword">else</span>
+0161             disp([<span class="string">'Yalmip error: '</span> yalmiperror(errorflag1)]); <span class="comment">% some other error</span>
+0162         <span class="keyword">end</span>        
+0163     <span class="keyword">end</span>
+0164 
+0165     <a name="_sub2" href="#_subfunctions" class="code">function update_hist_data()</a>
+0166         
+0167         Sys.system_data.time(end+1) = time_new;
+0168         Sys.system_data.U(:,end+1) = u_new;
+0169         Sys.system_data.X(:,end+1) = x_new;
+0170         Sys.system_data.Y(:,end+1) = y_new;
+0171         Sys.system_data.W(:,end+1) = w_new;
+0172         
+0173         Sys.model_data.time = time_d;
+0174         Sys.model_data.X = double(Xpred);
+0175         Sys.model_data.Y = [Sys.sysd.C*double(Xpred(:,1:end-1)) + Sys.sysd.D*[double(Upred); double(Wn(:,1:end-1))]];
+0176         Sys.model_data.U = double(Upred);
+0177         Sys.model_data.W = Wn;
+0178         
+0179     <span class="keyword">end</span>
+0180 
+0181     <a name="_sub3" href="#_subfunctions" class="code">function update_controller_data()</a>
+0182         
+0183         <span class="keyword">if</span> (i_past&gt;= L+1)
+0184             time_d = time_d+ts; <span class="comment">% move forward one time step</span>
+0185         <span class="keyword">end</span>
+0186         
+0187         <span class="keyword">if</span> i_transient&lt;L
+0188             donen(1:i_transient-1) = 1;  <span class="comment">% we reuse what has been computed at the previous step</span>
+0189             Un(:,1:i_transient-1) = Sys.system_data.U(:,1:i_transient-1); <span class="comment">%  previously computed inputs</span>
+0190             Xn(:,1:i_transient) = Sys.system_data.X(:, 1:i_transient);
+0191             pn(i_transient) = rob;
 0192         <span class="keyword">else</span>
-0193             Wn = 0*time_d;
-0194         <span class="keyword">end</span>
-0195         
-0196     <span class="keyword">end</span>
-0197 
-0198 
-0199 <span class="keyword">end</span>
-0200 
-0201 <a name="_sub4" href="#_subfunctions" class="code">function Stop()</a>
-0202 <span class="keyword">global</span> StopRequest;
-0203 StopRequest = true;
-0204 <span class="keyword">end</span>
-0205</pre></div>
-<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0193             pn(1:L) = rob*ones(1,L);
+0194             donen(1:L-1) = 1;
+0195             Un(:,1:L-1) = Sys.system_data.U(:,end-L+2:end);     <span class="comment">%    previously computed inputs</span>
+0196             Xn(:,1:L) =   Sys.system_data.X(:,end-L+1:end);     <span class="comment">%    previously computed temperatures</span>
+0197         <span class="keyword">end</span>
+0198         
+0199         <span class="keyword">if</span> nw&gt;1
+0200             <span class="keyword">for</span> wx=1:nw
+0201                 Wn(wx,:) = interp1( time , Wref(wx,:)', time_d)';
+0202             <span class="keyword">end</span>
+0203         <span class="keyword">else</span>
+0204             Wn = 0*time_d;
+0205         <span class="keyword">end</span>
+0206         
+0207     <span class="keyword">end</span>
+0208 
+0209 
+0210 <span class="keyword">end</span>
+0211 
+0212 <a name="_sub4" href="#_subfunctions" class="code">function Stop()</a>
+0213 <span class="keyword">global</span> StopRequest;
+0214 StopRequest = true;
+0215 <span class="keyword">end</span>
+0216</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 19:17:03 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

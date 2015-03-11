@@ -32,7 +32,10 @@
  Synopsis: st = display(phis)
  
  Input:
-  - phis : an array of STL formula</pre></div>
+  - phis : an array of STL formula
+
+ Outputs:
+  - st : the string</pre></div>
 
 <!-- crossreference -->
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
@@ -55,15 +58,17 @@ This function is called by:
 0006 <span class="comment">% Input:</span>
 0007 <span class="comment">%  - phis : an array of STL formula</span>
 0008 <span class="comment">%</span>
-0009 
-0010 <span class="keyword">for</span> ii = 1:numel(phis)
-0011     st = disp(phis(ii),1);
-0012     fprintf(st);
-0013 <span class="keyword">end</span>
-0014 
-0015 fprintf(<span class="string">'\n'</span>);
+0009 <span class="comment">% Outputs:</span>
+0010 <span class="comment">%  - st : the string</span>
+0011 
+0012 <span class="keyword">for</span> ii = 1:numel(phis)
+0013     st = disp(phis(ii),1);
+0014     fprintf(st);
+0015 <span class="keyword">end</span>
 0016 
-0017 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0017 fprintf(<span class="string">'\n'</span>);
+0018 
+0019 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 19:17:03 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

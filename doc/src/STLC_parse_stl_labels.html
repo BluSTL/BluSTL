@@ -4,7 +4,7 @@
 <head>
   <title>Description of STLC_parse_stl_labels</title>
   <meta name="keywords" content="STLC_parse_stl_labels">
-  <meta name="description" content="">
+  <meta name="description" content="STLC_parse_stl_labels     Parses the STL specifications of an STLC_lti">
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
   <meta name="robots" content="index, follow">
@@ -21,13 +21,25 @@
 </h1>
 
 <h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="box"><strong></strong></div>
+<div class="box"><strong>STLC_parse_stl_labels     Parses the STL specifications of an STLC_lti</strong></div>
 
 <h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 <div class="box"><strong>function stl_list = STLC_parse_stl_labels(Sys) </strong></div>
 
 <h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="fragment"><pre class="comment"></pre></div>
+<div class="fragment"><pre class="comment"> STLC_parse_stl_labels     Parses the STL specifications of an STLC_lti 
+                           instance and replaces state, output, input and 
+                           disturbance labels with the corresponding indices 
+                           in X, Y, U and W.
+                           
+ Input: 
+       Sys: an STLC_lti instance
+
+ Output: 
+       stl_list: STL specification over X, Y, U and W.
+
+ :copyright: TBD
+ :license: TBD</pre></div>
 
 <!-- crossreference -->
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
@@ -36,29 +48,42 @@ This function calls:
 </ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(STLCsys)">STLC_get_adversary</a>	</li><li><a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>	</li></ul>
+<li><a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(Sys)">STLC_get_adversary</a>	STLC_get_adversary    constructs the controller object for the adversarial</li><li><a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>	STLC_get_controller constructs the controller object for an STLC_lti instance</li></ul>
 <!-- crossreference -->
 
 
 
 <h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 <div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function stl_list = STLC_parse_stl_labels(Sys)</a>
-0002 
-0003 labels = {<span class="string">'xlabel'</span>, <span class="string">'ylabel'</span>, <span class="string">'ulabel'</span>, <span class="string">'wlabel'</span>};
-0004 vars = {<span class="string">'X'</span>,<span class="string">'Y'</span>,<span class="string">'U'</span>,<span class="string">'W'</span>};
-0005 
-0006 stl_list = Sys.stl_list;
-0007 <span class="keyword">for</span> istl = 1:numel(Sys.stl_list)
-0008     stl = Sys.stl_list{istl}; 
-0009     <span class="keyword">for</span> ilabel = 1:numel(labels)
-0010         var = vars{ilabel};
-0011         <span class="keyword">for</span> jlabel = 1:numel(Sys.(labels{ilabel}))
-0012            label = Sys.(labels{ilabel}){jlabel};
-0013             stl = regexprep(stl,[<span class="string">'\&lt;'</span> label <span class="string">'\(t\)'</span>], [ var <span class="string">'('</span> num2str(jlabel) <span class="string">',t)'</span>] );             
-0014         <span class="keyword">end</span>
-0015     <span class="keyword">end</span>
-0016     stl_list{istl} = stl;
-0017 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0002 <span class="comment">% STLC_parse_stl_labels     Parses the STL specifications of an STLC_lti</span>
+0003 <span class="comment">%                           instance and replaces state, output, input and</span>
+0004 <span class="comment">%                           disturbance labels with the corresponding indices</span>
+0005 <span class="comment">%                           in X, Y, U and W.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Input:</span>
+0008 <span class="comment">%       Sys: an STLC_lti instance</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Output:</span>
+0011 <span class="comment">%       stl_list: STL specification over X, Y, U and W.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% :copyright: TBD</span>
+0014 <span class="comment">% :license: TBD</span>
+0015 
+0016 labels = {<span class="string">'xlabel'</span>, <span class="string">'ylabel'</span>, <span class="string">'ulabel'</span>, <span class="string">'wlabel'</span>};
+0017 vars = {<span class="string">'X'</span>,<span class="string">'Y'</span>,<span class="string">'U'</span>,<span class="string">'W'</span>};
+0018 
+0019 stl_list = Sys.stl_list;
+0020 <span class="keyword">for</span> istl = 1:numel(Sys.stl_list)
+0021     stl = Sys.stl_list{istl}; 
+0022     <span class="keyword">for</span> ilabel = 1:numel(labels)
+0023         var = vars{ilabel};
+0024         <span class="keyword">for</span> jlabel = 1:numel(Sys.(labels{ilabel}))
+0025            label = Sys.(labels{ilabel}){jlabel};
+0026             stl = regexprep(stl,[<span class="string">'\&lt;'</span> label <span class="string">'\(t\)'</span>], [ var <span class="string">'('</span> num2str(jlabel) <span class="string">',t)'</span>] );             
+0027         <span class="keyword">end</span>
+0028     <span class="keyword">end</span>
+0029     stl_list{istl} = stl;
+0030 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 19:17:03 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

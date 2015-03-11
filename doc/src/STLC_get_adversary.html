@@ -4,7 +4,7 @@
 <head>
   <title>Description of STLC_get_adversary</title>
   <meta name="keywords" content="STLC_get_adversary">
-  <meta name="description" content="">
+  <meta name="description" content="STLC_get_adversary    constructs the controller object for the adversarial">
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
   <meta name="robots" content="index, follow">
@@ -21,23 +21,31 @@
 </h1>
 
 <h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="box"><strong></strong></div>
+<div class="box"><strong>STLC_get_adversary    constructs the controller object for the adversarial</strong></div>
 
 <h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="box"><strong>function adversary = STLC_get_adversary(STLCsys) </strong></div>
+<div class="box"><strong>function adversary = STLC_get_adversary(Sys) </strong></div>
 
 <h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="fragment"><pre class="comment">
- get_adversary(STLCsys)
+<div class="fragment"><pre class="comment"> STLC_get_adversary    constructs the controller object for the adversarial 
+                       environment of an STLC_lti instance
+                           
+ Input: 
+       Sys: an STLC_lti instance
 
-  Compiles the controller for system STLsys
-  Output: yalmip controller</pre></div>
+ Output: 
+       adversary: a YALMIP optimizer object that solves the STL-constrained 
+                  optimal control problem for the adversarial environment
+                  in which Sys operates
+
+ :copyright: TBD
+ :license: TBD</pre></div>
 
 <!-- crossreference -->
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 This function calls:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="STL2MILP_robust.html" class="code" title="function [F,P] = STL2MILP_robust(phi,t0,k,ts,var,M)">STL2MILP_robust</a>	INPUTS</li><li><a href="STLC_parse_stl_labels.html" class="code" title="function stl_list = STLC_parse_stl_labels(Sys)">STLC_parse_stl_labels</a>	</li><li><a href="STLformula.html" class="code" title="">STLformula</a>	</li></ul>
+<li><a href="STL2MILP_robust.html" class="code" title="function [F,P] = STL2MILP_robust(phi,k,ts,var,M)">STL2MILP_robust</a>	STL2MILP_robust  constructs MILP constraints in YALMIP that compute</li><li><a href="STLC_parse_stl_labels.html" class="code" title="function stl_list = STLC_parse_stl_labels(Sys)">STLC_parse_stl_labels</a>	STLC_parse_stl_labels     Parses the STL specifications of an STLC_lti</li><li><a href="STLformula.html" class="code" title="">STLformula</a>	</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
 <li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
@@ -46,105 +54,111 @@ This function is called by:
 
 
 <h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
-<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function adversary = STLC_get_adversary(STLCsys)</a>
-0002 <span class="comment">%</span>
-0003 <span class="comment">% get_adversary(STLCsys)</span>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function adversary = STLC_get_adversary(Sys)</a>
+0002 <span class="comment">% STLC_get_adversary    constructs the controller object for the adversarial</span>
+0003 <span class="comment">%                       environment of an STLC_lti instance</span>
 0004 <span class="comment">%</span>
-0005 <span class="comment">%  Compiles the controller for system STLsys</span>
-0006 <span class="comment">%  Output: yalmip controller</span>
+0005 <span class="comment">% Input:</span>
+0006 <span class="comment">%       Sys: an STLC_lti instance</span>
 0007 <span class="comment">%</span>
-0008 <span class="comment">%</span>
-0009 
-0010 <span class="comment">%% Time</span>
-0011 ts=STLCsys.ts; <span class="comment">% sampling time</span>
-0012 L=STLCsys.L;  <span class="comment">% horizon (# of steps)</span>
-0013 
-0014 <span class="comment">%% System dimensions and variables</span>
-0015 nu=STLCsys.nu;
-0016 nx=STLCsys.nx;
-0017 nw=STLCsys.nw;
-0018 ny=STLCsys.ny;
+0008 <span class="comment">% Output:</span>
+0009 <span class="comment">%       adversary: a YALMIP optimizer object that solves the STL-constrained</span>
+0010 <span class="comment">%                  optimal control problem for the adversarial environment</span>
+0011 <span class="comment">%                  in which Sys operates</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% :copyright: TBD</span>
+0014 <span class="comment">% :license: TBD</span>
+0015 
+0016 <span class="comment">%% Time</span>
+0017 ts=Sys.ts; <span class="comment">% sampling time</span>
+0018 L=Sys.L;  <span class="comment">% horizon (# of steps)</span>
 0019 
-0020 <span class="comment">% variables</span>
-0021 X = sdpvar(nx, 2*L);
-0022 Y = sdpvar(ny, 2*L-1);
-0023 W = sdpvar(nw, 2*L);
-0024 
-0025 <span class="comment">% given as parameters to the optimizer</span>
-0026 done = binvar(1,2*L-1);
-0027 p = sdpvar(1,L);
-0028 Xdone = sdpvar(nx, 2*L);
-0029 U = sdpvar(nu,2*L-1); 
+0020 <span class="comment">%% System dimensions and variables</span>
+0021 nu=Sys.nu;
+0022 nx=Sys.nx;
+0023 nw=Sys.nw;
+0024 ny=Sys.ny;
+0025 
+0026 <span class="comment">% variables</span>
+0027 X = sdpvar(nx, 2*L);
+0028 Y = sdpvar(ny, 2*L-1);
+0029 W = sdpvar(nw, 2*L);
 0030 
-0031 Wref = sdpvar(nw, 2*L);
-0032 
-0033 <span class="comment">%% STL formula</span>
-0034 Fstl=[]; 
-0035 varStd = struct(<span class="string">'X'</span>,X,<span class="string">'Y'</span>,Y,<span class="string">'U'</span>,U, <span class="string">'W'</span>, W);
+0031 <span class="comment">% given as parameters to the optimizer</span>
+0032 done = binvar(1,2*L-1);
+0033 p = sdpvar(1,L);
+0034 Xdone = sdpvar(nx, 2*L);
+0035 U = sdpvar(nu,2*L-1); 
 0036 
-0037 <span class="keyword">if</span> isstruct(STLCsys.var)
-0038     <span class="comment">%remove overlapping fields from std</span>
-0039     var = rmfield(varStd, intersect(fieldnames(STLCsys.var), fieldnames(varStd)));
-0040     keys = [fieldnames(var); fieldnames(STLCsys.var)];
-0041     var = cell2struct([struct2cell(varStd); struct2cell(STLCsys.var)], keys, 1);
-0042 <span class="keyword">else</span>
-0043     var = varStd;
-0044 <span class="keyword">end</span>
-0045 var.Wref = Wref;
-0046 
-0047 stl_list= <a href="STLC_parse_stl_labels.html" class="code" title="function stl_list = STLC_parse_stl_labels(Sys)">STLC_parse_stl_labels</a>(STLCsys);
-0048 M = STLCsys.bigM;
-0049 
-0050 Pphi=sdpvar(1,1);
-0051 <span class="keyword">for</span> i = 1:numel(stl_list)
-0052     phi = <a href="STLformula.html" class="code" title="">STLformula</a>(<span class="string">'phi'</span>, stl_list{i});
-0053     [Fphi, Pphi] = <a href="STL2MILP_robust.html" class="code" title="function [F,P] = STL2MILP_robust(phi,t0,k,ts,var,M)">STL2MILP_robust</a>(phi,1, 2*L, ts, var, M);
-0054     Fstl = [Fstl Fphi];
-0055 <span class="keyword">end</span>
-0056 
-0057 <span class="comment">%% Disturbances constraints</span>
-0058 Fw = [];
-0059 <span class="keyword">for</span> iw = 1:nw
-0060         Fw = [Fw, Wref(iw,:) + STLCsys.w_lb(iw)  &lt;= W(iw,:) &lt;= Wref(iw,:)+STLCsys.w_ub(iw)];
+0037 Wref = sdpvar(nw, 2*L);
+0038 
+0039 <span class="comment">%% STL formula</span>
+0040 Fstl=[]; 
+0041 varStd = struct(<span class="string">'X'</span>,X,<span class="string">'Y'</span>,Y,<span class="string">'U'</span>,U, <span class="string">'W'</span>, W);
+0042 
+0043 <span class="keyword">if</span> isstruct(Sys.var)
+0044     <span class="comment">%remove overlapping fields from std</span>
+0045     var = rmfield(varStd, intersect(fieldnames(Sys.var), fieldnames(varStd)));
+0046     keys = [fieldnames(var); fieldnames(Sys.var)];
+0047     var = cell2struct([struct2cell(varStd); struct2cell(Sys.var)], keys, 1);
+0048 <span class="keyword">else</span>
+0049     var = varStd;
+0050 <span class="keyword">end</span>
+0051 var.Wref = Wref;
+0052 
+0053 stl_list= <a href="STLC_parse_stl_labels.html" class="code" title="function stl_list = STLC_parse_stl_labels(Sys)">STLC_parse_stl_labels</a>(Sys);
+0054 M = Sys.bigM;
+0055 
+0056 Pphi=sdpvar(1,1);
+0057 <span class="keyword">for</span> i = 1:numel(stl_list)
+0058     phi = <a href="STLformula.html" class="code" title="">STLformula</a>(<span class="string">'phi'</span>, stl_list{i});
+0059     [Fphi, Pphi] = <a href="STL2MILP_robust.html" class="code" title="function [F,P] = STL2MILP_robust(phi,k,ts,var,M)">STL2MILP_robust</a>(phi,1, 2*L, ts, var, M);
+0060     Fstl = [Fstl Fphi];
 0061 <span class="keyword">end</span>
 0062 
-0063 
-0064 <span class="comment">%% Dynamics constraints</span>
-0065 Fdyn = [];
-0066 
-0067 [Ad,Bd,Cd,Dd]=ssdata(STLCsys.sysd);
+0063 <span class="comment">%% Disturbances constraints</span>
+0064 Fw = [];
+0065 <span class="keyword">for</span> iw = 1:nw
+0066         Fw = [Fw, Wref(iw,:) + Sys.w_lb(iw)  &lt;= W(iw,:) &lt;= Wref(iw,:)+Sys.w_ub(iw)];
+0067 <span class="keyword">end</span>
 0068 
-0069 Bdu=Bd(:,1:nu);
-0070 Bdw=Bd(:,nu+1:end);
-0071 Ddu=Dd(:,1:nu);
-0072 Ddw=Dd(:,nu+1:end);
-0073 
-0074 <span class="comment">% Constraints for states</span>
-0075 <span class="keyword">for</span> k=1:2*L
-0076     <span class="keyword">if</span> k==1
-0077         Fdyn = [Fdyn, X(:,1)==Xdone(:,1)];
-0078     <span class="keyword">else</span>
-0079         <span class="comment">% done values (history)</span>
-0080         <span class="comment">% if k is past (done(k)==1), use values in Tdone, otherwise use linear update</span>
-0081         Fdyn = [Fdyn, Xdone(:,k) - (1-done(k-1))*M &lt;=  X(:,k) &lt;= Xdone(:, k)+ (1-done(k-1))*M];
-0082         
-0083         <span class="comment">% not done values</span>
-0084         Fdyn = [Fdyn, ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )) - done(k-1)*M) &lt;=  X(:,k) &lt;= ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )) + done(k-1)*M)];
-0085     <span class="keyword">end</span>
-0086 <span class="keyword">end</span>
-0087 
-0088 <span class="comment">% Constraints for outputs</span>
-0089 <span class="keyword">for</span> k=1:2*L-1
-0090         Fdyn = [Fdyn, Y(:,k) == Cd*X(:,k)+ Ddu*U(:,k) + Ddw * W(:,k)];
-0091 <span class="keyword">end</span>
-0092 
-0093 <span class="comment">%% Objective function</span>
-0094 obj = min(Pphi(1:end-1,1));
-0095 
-0096 options = STLCsys.solver_options;
-0097 adv_params= {done, p, Xdone, U, Wref};
-0098 adv_output= {W, X, Pphi};
-0099 adversary = optimizer([Fdyn Fw Fstl],obj,options,adv_params, adv_output );</pre></div>
-<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0069 
+0070 <span class="comment">%% Dynamics constraints</span>
+0071 Fdyn = [];
+0072 
+0073 [Ad,Bd,Cd,Dd]=ssdata(Sys.sysd);
+0074 
+0075 Bdu=Bd(:,1:nu);
+0076 Bdw=Bd(:,nu+1:end);
+0077 Ddu=Dd(:,1:nu);
+0078 Ddw=Dd(:,nu+1:end);
+0079 
+0080 <span class="comment">% Constraints for states</span>
+0081 <span class="keyword">for</span> k=1:2*L
+0082     <span class="keyword">if</span> k==1
+0083         Fdyn = [Fdyn, X(:,1)==Xdone(:,1)];
+0084     <span class="keyword">else</span>
+0085         <span class="comment">% done values (history)</span>
+0086         <span class="comment">% if k is past (done(k)==1), use values in Tdone, otherwise use linear update</span>
+0087         Fdyn = [Fdyn, Xdone(:,k) - (1-done(k-1))*M &lt;=  X(:,k) &lt;= Xdone(:, k)+ (1-done(k-1))*M];
+0088         
+0089         <span class="comment">% not done values</span>
+0090         Fdyn = [Fdyn, ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )) - done(k-1)*M) &lt;=  X(:,k) &lt;= ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )) + done(k-1)*M)];
+0091     <span class="keyword">end</span>
+0092 <span class="keyword">end</span>
+0093 
+0094 <span class="comment">% Constraints for outputs</span>
+0095 <span class="keyword">for</span> k=1:2*L-1
+0096         Fdyn = [Fdyn, Y(:,k) == Cd*X(:,k)+ Ddu*U(:,k) + Ddw * W(:,k)];
+0097 <span class="keyword">end</span>
+0098 
+0099 <span class="comment">%% Objective function</span>
+0100 obj = min(Pphi(1:end-1,1));
+0101 
+0102 options = Sys.solver_options;
+0103 adv_params= {done, p, Xdone, U, Wref};
+0104 adv_output= {W, X, Pphi};
+0105 adversary = optimizer([Fdyn Fw Fstl],obj,options,adv_params, adv_output );</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 19:17:03 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

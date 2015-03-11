@@ -33,10 +33,10 @@
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 This function calls:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(STLCsys)">STLC_get_adversary</a>	</li><li><a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>	</li><li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li><li><a href="STLC_run_adversarial.html" class="code" title="function [Sys, params] = STLC_run_adversarial(Sys, controller,adversary)">STLC_run_adversarial</a>	</li><li><a href="STLC_run_deterministic.html" class="code" title="function [Sys, params] = STLC_run_deterministic(Sys, controller)">STLC_run_deterministic</a>	</li><li><a href="STLC_run_open_loop.html" class="code" title="function [Sys, params] = STLC_run_open_loop(Sys, controller)">STLC_run_open_loop</a>	</li><li><a href="STLC_run_open_loop_adv.html" class="code" title="function [Sys, params] = STLC_run_open_loop_adv(Sys, controller, adversary)">STLC_run_open_loop_adv</a>	</li><li><a href="STLC_update_plot.html" class="code" title="function Sys = STLC_update_plot(Sys)">STLC_update_plot</a>	</li></ul>
+<li><a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(Sys)">STLC_get_adversary</a>	STLC_get_adversary    constructs the controller object for the adversarial</li><li><a href="STLC_get_controller.html" class="code" title="function controller = STLC_get_controller(Sys)">STLC_get_controller</a>	STLC_get_controller constructs the controller object for an STLC_lti instance</li><li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li><li><a href="STLC_run_adversarial.html" class="code" title="function [Sys, params] = STLC_run_adversarial(Sys, controller,adversary)">STLC_run_adversarial</a>	STLC_run_adversarial      runs a receding horizon control problem</li><li><a href="STLC_run_deterministic.html" class="code" title="function [Sys, params] = STLC_run_deterministic(Sys, controller)">STLC_run_deterministic</a>	STLC_run_deterministic    runs a receding horizon control problem</li><li><a href="STLC_run_open_loop.html" class="code" title="function [Sys, params] = STLC_run_open_loop(Sys, controller)">STLC_run_open_loop</a>	STLC_run_open_loop        runs an open-loop optimal control problem</li><li><a href="STLC_run_open_loop_adv.html" class="code" title="function [Sys, params] = STLC_run_open_loop_adv(Sys, controller, adversary)">STLC_run_open_loop_adv</a>	STLC_run_open_loop_adv    runs an open-loop optimal control problem</li><li><a href="STLC_update_plot.html" class="code" title="function Sys = STLC_update_plot(Sys)">STLC_update_plot</a>	STLC_update_plot updates the plots of an STLC_lti at runtime</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="../examples/grid_system/grid_system.html" class="code" title="">grid_system</a>	</li><li><a href="../examples/hvac_room/hvac_room.html" class="code" title="">hvac_room</a>	</li><li><a href="../examples/hvac_room/hvac_room_det.html" class="code" title="">hvac_room_det</a>	</li><li><a href="../examples/quadrotor/quad_system.html" class="code" title="">quad_system</a>	</li><li><a href="../examples/signal_generator/signal_generator.html" class="code" title="">signal_generator</a>	</li><li><a href="../examples/signal_generator/test_signal_generator.html" class="code" title="">test_signal_generator</a>	% Create the system</li><li><a href="../examples/simple_cars/simple_cars.html" class="code" title="">simple_cars</a>	</li><li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
+<li><a href="../examples/grid_system/grid_system.html" class="code" title="">grid_system</a>	</li><li><a href="../examples/hvac_room/hvac_room.html" class="code" title="">hvac_room</a>	</li><li><a href="../examples/quadrotor/quad_system.html" class="code" title="">quad_system</a>	</li><li><a href="../examples/signal_generator/signal_generator.html" class="code" title="">signal_generator</a>	</li><li><a href="../examples/signal_generator/test_signal_generator.html" class="code" title="">test_signal_generator</a>	% Create the system</li><li><a href="../examples/simple_cars/simple_cars.html" class="code" title="">simple_cars</a>	</li><li><a href="STLC_lti.html" class="code" title="">STLC_lti</a>	</li></ul>
 <!-- crossreference -->
 
 <h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
@@ -265,7 +265,7 @@ This function is called by:
 0219         
 0220         <a name="_sub4" href="#_subfunctions" class="code">function adversary = get_adversary(Sys)</a>
 0221             Sys.sysd = c2d(Sys.sys, Sys.ts);
-0222             adversary = <a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(STLCsys)">STLC_get_adversary</a>(Sys);
+0222             adversary = <a href="STLC_get_adversary.html" class="code" title="function adversary = STLC_get_adversary(Sys)">STLC_get_adversary</a>(Sys);
 0223         <span class="keyword">end</span>
 0224         
 0225         <span class="comment">% Executes the controller in open loop mode</span>
@@ -294,6 +294,6 @@ This function is called by:
 0248         <span class="keyword">end</span>
 0249     <span class="keyword">end</span>
 0250 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<hr><address>Generated on Tue 10-Mar-2015 19:17:03 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

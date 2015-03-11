@@ -1,5 +1,6 @@
 /* Created by mdot for Matlab */
 digraph m2html {
+  STL2MILP_boolean -> STL2MILP_boolean;
   STL2MILP_robust -> STL2MILP_robust;
   STL2MILP_robust_interval -> STL2MILP_robust_interval;
   STLC_get_adversary -> STL2MILP_robust;
@@ -18,6 +19,7 @@ digraph m2html {
   STLC_lti -> STLC_update_plot;
   STLformula -> STLformula;
 
+  STL2MILP_boolean [URL="STL2MILP_boolean.html"];
   STL2MILP_robust [URL="STL2MILP_robust.html"];
   STL2MILP_robust_interval [URL="STL2MILP_robust_interval.html"];
   STLC_get_adversary [URL="STLC_get_adversary.html"];

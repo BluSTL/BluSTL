@@ -5,11 +5,8 @@ digraph m2html {
   test_grid_system -> grid_system;
   hvac_room -> hvac_room;
   hvac_room -> STLC_lti;
-  hvac_room_det -> hvac_room_det;
-  hvac_room_det -> STLC_lti;
   init_hvac_room_data -> get_temp_bnd;
   test_hvac_room -> hvac_room;
-  test_hvac_room -> hvac_room_det;
   Init_Quads -> getSpecs;
   envLTL -> getNotAP;
   envLTL -> getPoly;
@@ -31,6 +28,7 @@ digraph m2html {
   simple_cars -> simple_cars;
   simple_cars -> STLC_lti;
   test_simple_cars -> simple_cars;
+  STL2MILP_boolean -> STL2MILP_boolean;
   STL2MILP_robust -> STL2MILP_robust;
   STL2MILP_robust_interval -> STL2MILP_robust_interval;
   STLC_get_adversary -> STL2MILP_robust;
@@ -62,7 +60,6 @@ digraph m2html {
   test_grid_system [URL="examples/grid_system/test_grid_system.html"];
   get_temp_bnd [URL="examples/hvac_room/get_temp_bnd.html"];
   hvac_room [URL="examples/hvac_room/hvac_room.html"];
-  hvac_room_det [URL="examples/hvac_room/hvac_room_det.html"];
   init_hvac_room_data [URL="examples/hvac_room/init_hvac_room_data.html"];
   test_hvac_room [URL="examples/hvac_room/test_hvac_room.html"];
   Init_Quads [URL="examples/quadrotor/Init_Quads.html"];
@@ -86,6 +83,7 @@ digraph m2html {
   init_plot [URL="examples/simple_cars/init_plot.html"];
   simple_cars [URL="examples/simple_cars/simple_cars.html"];
   test_simple_cars [URL="examples/simple_cars/test_simple_cars.html"];
+  STL2MILP_boolean [URL="src/STL2MILP_boolean.html"];
   STL2MILP_robust [URL="src/STL2MILP_robust.html"];
   STL2MILP_robust_interval [URL="src/STL2MILP_robust_interval.html"];
   STLC_get_adversary [URL="src/STLC_get_adversary.html"];

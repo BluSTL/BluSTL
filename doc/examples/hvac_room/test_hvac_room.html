@@ -33,7 +33,7 @@
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
 This function calls:
 <ul style="list-style-image:url(../../matlabicon.gif)">
-<li><a href="hvac_room.html" class="code" title="">hvac_room</a>	</li><li><a href="hvac_room_det.html" class="code" title="">hvac_room_det</a>	</li></ul>
+<li><a href="hvac_room.html" class="code" title="">hvac_room</a>	</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../../matlabicon.gif)">
 </ul>
@@ -42,19 +42,15 @@ This function is called by:
 
 
 <h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
-<div class="fragment"><pre>0001 HR1 = <a href="hvac_room_det.html" class="code" title="">hvac_room_det</a>();
-0002 HR1 = init_control(HR1,12,5);
-0003 HR1.h=[];
-0004 <span class="comment">%HR1.run_open_loop(HR1.controller);</span>
-0005 <span class="comment">%HR1.run_open_loop_adv(HR1.controller, HR1.adversary);</span>
-0006 <span class="comment">%HR1= HR1.run_deterministic(HR1.controller);</span>
-0007 HR1= HR1.run_adversarial(HR1.controller, HR1.adversary);
-0008 
-0009 
-0010 HR2 = <a href="hvac_room.html" class="code" title="">hvac_room</a>();
-0011 HR2 = init_control(HR2,10);
-0012 <span class="comment">%HR2.run_adversarial(HR2.controller, HR2.adversary)</span>
-0013</pre></div>
-<hr><address>Generated on Tue 10-Mar-2015 12:19:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<div class="fragment"><pre>0001 HR1 = <a href="hvac_room.html" class="code" title="">hvac_room</a>;
+0002 HR1 = init_control(HR1,12,0, 0);
+0003 HR1= HR1.run_adversarial(HR1.controller, HR1.adversary)
+0004 save2pdf(<span class="string">'hvac_det2.pdf'</span>, gcf)
+0005 
+0006 HR2 = <a href="hvac_room.html" class="code" title="">hvac_room</a>();
+0007 HR2 = init_control(HR2,12,5, 400);
+0008 HR2.run_adversarial(HR2.controller, HR2.adversary)
+0009 save2pdf(<span class="string">'hvac_nondet2.pdf'</span>, gcf)</pre></div>
+<hr><address>Generated on Tue 10-Mar-2015 19:17:03 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

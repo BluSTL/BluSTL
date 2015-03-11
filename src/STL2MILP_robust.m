@@ -127,9 +127,11 @@ function [F,z] = pred(st,k,var,M)
     for l=1:k
         t_st = st;
         t_st = regexprep(t_st,'t\)',[num2str(l) '\)']);
-        
-        zl = sdpvar(size(eval(t_st),1),size(eval(t_st),2));
-        zl = eval(t_st); 
+        %zl = sdpvar(size(eval(t_st),1),size(eval(t_st),2)); % is that
+        % necessary ??
+        try 
+            zl = eval(t_st);
+        end
         zAll = [zAll,zl];
     end
     

@@ -24,7 +24,7 @@ if isempty(Sys.h)
     for iY = Sys.plot_y
         subplot(nb_plots,1,cur_plot);
         hold on;grid on;
-        Sys.h.Ypast(iY) = plot(Sys.system_data.time(1:end-1), Sys.system_data.Y(iY,:));
+        Sys.h.Ypast(iY) = plot(Sys.system_data.time, Sys.system_data.Y(iY,:));
         Sys.h.Ymodel(iY) = plot(Sys.model_data.time(1:end-1), Sys.model_data.Y(iY,:), '--r');
         ylabel(Sys.ylabel{iY});
         cur_plot = cur_plot+1;

@@ -1,4 +1,11 @@
 function Sys = STLC_update_plot(Sys)
+% STLC_update_plot updates the plots of an STLC_lti at runtime
+%
+% Input: Sys, the STLC_lti instance
+% Output: Sys with plots modified
+%
+% :copyright: TBD
+% :license: TBD
 
 if isempty(Sys.h)
     Sys.h.hf = figure;

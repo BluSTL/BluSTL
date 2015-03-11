@@ -1,14 +1,26 @@
-function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)
+function [F,P] = STL2MILP_robust_interval(phi,k,ts,var,M)
+% STL2MILP_robust_interval  constructs MILP constraints in YALMIP that compute
+%                           the robust interval of satisfaction, i.e. the 
+%                           lower and upper bounds on the robustness of 
+%                           satisfaction for specification phi
+%
+%
+% Input: 
+%       phi:    an STLformula
+%       k:      the length of the trajectory
+%       ts:     the interval (in seconds) used for discretizing time
+%       var:    a dictionary mapping strings to variables
+%       M:   	a large positive constant used for big-M constraints  
+%
+% Output: 
+%       F:  YALMIP constraints
+%       P:  a struct containing YALMIP decision variables representing 
+%           upper (P.P1) and lower (P.P2) bounds on quantitative satisfaction 
+%           of phi over each time step from 1 to k 
+%
+% :copyright: TBD
+% :license: TBD
 
-    %INPUTS
-    % phi is an STLformula given as a string
-    % k is the length of the trajectory
-    % var maps strings to variables that appear in the predicates
-    % M   is big-M  
-        
-    %OUTPUTS
-    %P1,P2 -- sdpvars
-    %F -- constraints on variables in P
 
     if (nargin==4);
         M = 1000;
@@ -39,34 +51,34 @@ function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)
     switch (phi.type)
         
         case 'predicate'
-            [F,P.P1,P.P2] = pred(phi.st,t0,k,var,M);
+            [F,P.P1,P.P2] = pred(phi.st,k,var,M);
                      
         case 'not'
-            [Frest,Prest1,Prest2] = STL2MILP_robust_interval(phi.phi,t0,k,ts, var,M);
+            [Frest,Prest1,Prest2] = STL2MILP_robust_interval(phi.phi,k,ts, var,M);
             [Fnot, Pnot1,Pnot2] = not(Prest1,Prest2);
             F = [F, Fnot, Frest];
             P.P1 = Pnot1;
             P.P2 = Pnot2;
 
         case 'or'
-            [Fdis1,Pdis11,Pdis12] = STL2MILP_robust_interval(phi.phi1,t0,k,ts, var,M);
-            [Fdis2,Pdis21,Pdis22] = STL2MILP_robust_interval(phi.phi2,t0,k,ts, var,M);
+            [Fdis1,Pdis11,Pdis12] = STL2MILP_robust_interval(phi.phi1,k,ts, var,M);
+            [Fdis2,Pdis21,Pdis22] = STL2MILP_robust_interval(phi.phi2,k,ts, var,M);
             [For, Por1,Por2] = or([Pdis11;Pdis21],[Pdis12;Pdis22],M);
             F = [F, For, Fdis1, Fdis2];
             P.P1 = Por1;
             P.P2 = Por2;
 
         case 'and'
-            [Fcon1,Pcon11,Pcon12] = STL2MILP_robust_interval(phi.phi1,t0,k,ts, var,M);
-            [Fcon2,Pcon21,Pcon22] = STL2MILP_robust_interval(phi.phi2,t0,k,ts, var,M);
+            [Fcon1,Pcon11,Pcon12] = STL2MILP_robust_interval(phi.phi1,k,ts, var,M);
+            [Fcon2,Pcon21,Pcon22] = STL2MILP_robust_interval(phi.phi2,k,ts, var,M);
             [Fand,Pand1,Pand2] = and([Pcon11;Pcon21],[Pcon12;Pcon22],M);
             F = [F, Fand, Fcon1, Fcon2];
             P.P1 = Pand1;
             P.P2 = Pand2;
 
         case '=>'
-            [Fant,Pant1,Pant2] = STL2MILP_robust_interval(phi.phi1,t0,k, ts,var,M);
-            [Fcons,Pcons1,Pcons2] = STL2MILP_robust_interval(phi.phi2,t0,k,ts, var,M);
+            [Fant,Pant1,Pant2] = STL2MILP_robust_interval(phi.phi1,k, ts,var,M);
+            [Fcons,Pcons1,Pcons2] = STL2MILP_robust_interval(phi.phi2,k,ts, var,M);
             [Fnotant,Pnotant1,Pnotant2] = not(Pant1,Pant2);
             [Fimp,Pimp1,Pimp2] = or([Pnotant1;Pcons1],[Pnotant2;Pcons2],M);
             F = [F, Fant, Fnotant, Fcons, Fimp];
@@ -74,7 +86,7 @@ function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)
             P.P2 = Pimp2;
             
         case 'always'
-            [Frest,Prest1,Prest2] = STL2MILP_robust_interval(phi.phi,t0,k, ts, var,M);
+            [Frest,Prest1,Prest2] = STL2MILP_robust_interval(phi.phi,k, ts, var,M);
             [Falw,Palw1,Palw2] = always(Prest1,Prest2,a,b,k,M);
             F = [F, Falw];
             F = [F, Frest];
@@ -82,7 +94,7 @@ function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)
             P.P2 = Palw2;
 
         case 'eventually'
-            [Frest,Prest1,Prest2] = STL2MILP_robust_interval(phi.phi,t0,k, ts, var,M);
+            [Frest,Prest1,Prest2] = STL2MILP_robust_interval(phi.phi,k, ts, var,M);
             [Fev,Pev1,Pev2] = eventually(Prest1,Prest2,a,b,k,M);
             F = [F, Fev];
             F = [F, Frest];
@@ -90,8 +102,8 @@ function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)
             P.P2 = Pev2;
           
         case 'until'
-            [Fp,Pp1,Pp2] = STL2MILP_robust_interval(phi.phi1,t0,k, ts, var,M);
-            [Fq,Pq1,Pq2] = STL2MILP_robust_interval(phi.phi2,t0,k, ts, var,M);
+            [Fp,Pp1,Pp2] = STL2MILP_robust_interval(phi.phi1,k, ts, var,M);
+            [Fq,Pq1,Pq2] = STL2MILP_robust_interval(phi.phi2,k, ts, var,M);
             [Funtil,Puntil1,Puntil2] = until(Pp1,Pp2,Pq1,Pq2,a,b,k,M);
             F = [F,Funtil,Fp,Fq];
             P.P1 = Puntil1;
@@ -99,7 +111,7 @@ function [F,P] = STL2MILP_robust_interval(phi,t0,k,ts,var,M)
     end   
 end
 
-function [F,z1,z2] = pred(st,t0, k,var,M)
+function [F,z1,z2] = pred(st,k,var,M)
     % Enforce constraints based on predicates 
     % 
     % var is the variable dictionary    

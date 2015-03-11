@@ -1,10 +1,23 @@
 function [Sys, params] = STLC_run_adversarial(Sys, controller,adversary)
+% STLC_run_adversarial      runs a receding horizon control problem 
+%                           for the system described by Sys, using the
+%                           provided controller and adversary optimizer
+%                           objects, using the horizon defined by Sys.L
+%                           
+% Input: 
+%       Sys: an STLC_lti instance
+%       controller: a YALMIP opmitizer object representing the system's 
+%                   optimization problem
+%       adversary: a YALMIP opmitizer object representing the adversarial  
+%                  environment's optimization problem
 %
-% run_adversarial(controller, adversary)
+% Output: 
+%       Sys: modified with additional system_data
+%       params: controller data
 %
-%  Output: hist_data, params (controller data)
-%
-%
+% :copyright: TBD
+% :license: TBD
+
 global StopRequest
 StopRequest=0;
 

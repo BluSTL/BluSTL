@@ -6,6 +6,8 @@ function st = STLdisplay(phis)
 % Input:
 %  - phis : an array of STL formula
 %
+% Outputs:
+%  - st : the string
 
 for ii = 1:numel(phis)
     st = disp(phis(ii),1);

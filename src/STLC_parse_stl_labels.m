@@ -1,4 +1,17 @@
 function stl_list = STLC_parse_stl_labels(Sys)
+% STLC_parse_stl_labels     Parses the STL specifications of an STLC_lti 
+%                           instance and replaces state, output, input and 
+%                           disturbance labels with the corresponding indices 
+%                           in X, Y, U and W.
+%                           
+% Input: 
+%       Sys: an STLC_lti instance
+%
+% Output: 
+%       stl_list: STL specification over X, Y, U and W.
+%
+% :copyright: TBD
+% :license: TBD
 
 labels = {'xlabel', 'ylabel', 'ulabel', 'wlabel'};
 vars = {'X','Y','U','W'};

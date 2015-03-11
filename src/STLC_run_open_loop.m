@@ -1,10 +1,21 @@
 function [Sys, params] = STLC_run_open_loop(Sys, controller)
+% STLC_run_open_loop        runs an open-loop optimal control problem 
+%                           for the system described by Sys, using the
+%                           provided controller optimizer object over the 
+%                           horizon defined by Sys.L
+%                           
+% Input: 
+%       Sys: an STLC_lti instance
+%       controller: a YALMIP opmitizer object representing the system's 
+%                   optimization problem
 %
-% run_deterministic
+% Output: 
+%       Sys: modified with additional system_data
+%       params: controller data
 %
-%  Output: hist_data, params (controller data)
-%
-%
+% :copyright: TBD
+% :license: TBD
+
 global StopRequest
 StopRequest=0;
 

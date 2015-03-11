@@ -1,10 +1,24 @@
 function [Sys, params] = STLC_run_open_loop_adv(Sys, controller, adversary)
+% STLC_run_open_loop_adv    runs an open-loop optimal control problem 
+%                           for the system described by Sys, using the
+%                           provided controller and adversary optimizer
+%                           objects over the horizon defined by Sys.L
+%                           
+% Input: 
+%       Sys: an STLC_lti instance
+%       controller: a YALMIP opmitizer object representing the system's 
+%                   optimization problem
+%       adversary: a YALMIP opmitizer object representing the adversarial  
+%                  environment's optimization problem
 %
-% run_open_loop_adv(Sys, controller, adversary)
+% Output: 
+%       Sys: modified with additional system_data
+%       params: controller data
 %
-%  Output: Sys, params (controller data)
-%
-%
+% :copyright: TBD
+% :license: TBD
+
+
 global StopRequest
 StopRequest=0;
 

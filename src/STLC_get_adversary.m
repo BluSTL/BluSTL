@@ -1,21 +1,27 @@
-function adversary = STLC_get_adversary(STLCsys)
+function adversary = STLC_get_adversary(Sys)
+% STLC_get_adversary    constructs the controller object for the adversarial 
+%                       environment of an STLC_lti instance
+%                           
+% Input: 
+%       Sys: an STLC_lti instance
 %
-% get_adversary(STLCsys)
+% Output: 
+%       adversary: a YALMIP optimizer object that solves the STL-constrained 
+%                  optimal control problem for the adversarial environment
+%                  in which Sys operates
 %
-%  Compiles the controller for system STLsys
-%  Output: yalmip controller
-%
-%
+% :copyright: TBD
+% :license: TBD
 
 %% Time
-ts=STLCsys.ts; % sampling time
-L=STLCsys.L;  % horizon (# of steps)
+ts=Sys.ts; % sampling time
+L=Sys.L;  % horizon (# of steps)
 
 %% System dimensions and variables
-nu=STLCsys.nu;
-nx=STLCsys.nx;
-nw=STLCsys.nw;
-ny=STLCsys.ny;
+nu=Sys.nu;
+nx=Sys.nx;
+nw=Sys.nw;
+ny=Sys.ny;
 
 % variables
 X = sdpvar(nx, 2*L);
@@ -34,18 +40,18 @@ Wref = sdpvar(nw, 2*L);
 Fstl=[]; 
 varStd = struct('X',X,'Y',Y,'U',U, 'W', W);
 
-if isstruct(STLCsys.var)
+if isstruct(Sys.var)
     %remove overlapping fields from std
-    var = rmfield(varStd, intersect(fieldnames(STLCsys.var), fieldnames(varStd)));
-    keys = [fieldnames(var); fieldnames(STLCsys.var)];
-    var = cell2struct([struct2cell(varStd); struct2cell(STLCsys.var)], keys, 1);
+    var = rmfield(varStd, intersect(fieldnames(Sys.var), fieldnames(varStd)));
+    keys = [fieldnames(var); fieldnames(Sys.var)];
+    var = cell2struct([struct2cell(varStd); struct2cell(Sys.var)], keys, 1);
 else
     var = varStd;
 end
 var.Wref = Wref;
 
-stl_list= STLC_parse_stl_labels(STLCsys);
-M = STLCsys.bigM;
+stl_list= STLC_parse_stl_labels(Sys);
+M = Sys.bigM;
 
 Pphi=sdpvar(1,1);
 for i = 1:numel(stl_list)
@@ -57,14 +63,14 @@ end
 %% Disturbances constraints
 Fw = [];
 for iw = 1:nw
-        Fw = [Fw, Wref(iw,:) + STLCsys.w_lb(iw)  <= W(iw,:) <= Wref(iw,:)+STLCsys.w_ub(iw)];
+        Fw = [Fw, Wref(iw,:) + Sys.w_lb(iw)  <= W(iw,:) <= Wref(iw,:)+Sys.w_ub(iw)];
 end
 
 
 %% Dynamics constraints
 Fdyn = [];
 
-[Ad,Bd,Cd,Dd]=ssdata(STLCsys.sysd);
+[Ad,Bd,Cd,Dd]=ssdata(Sys.sysd);
 
 Bdu=Bd(:,1:nu);
 Bdw=Bd(:,nu+1:end);
@@ -93,7 +99,7 @@ end
 %% Objective function
 obj = min(Pphi(1:end-1,1));
 
-options = STLCsys.solver_options;
+options = Sys.solver_options;
 adv_params= {done, p, Xdone, U, Wref};
 adv_output= {W, X, Pphi};
 adversary = optimizer([Fdyn Fw Fstl],obj,options,adv_params, adv_output );

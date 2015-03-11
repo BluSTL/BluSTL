@@ -1,11 +1,15 @@
 function controller = STLC_get_controller(Sys)
+% STLC_get_controller constructs the controller object for an STLC_lti instance
+%                           
+% Input: 
+%       Sys: an STLC_lti instance
 %
-% controller = get_controller(STLCsys)
+% Output: 
+%       controller: a YALMIP optimizer object that solves the STL-constrained 
+%                   optimal control problem for Sys
 %
-%  Compiles the controller for system STLsys
-%  Output: yalmip controller
-%
-%
+% :copyright: TBD
+% :license: TBD
 
 %% Time
 ts=Sys.ts; % sampling time

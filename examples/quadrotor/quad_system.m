@@ -1,6 +1,7 @@
 classdef quad_system < STLC_lti
     
     properties 
+    
         env
     end
     
@@ -61,7 +62,12 @@ classdef quad_system < STLC_lti
             
             
         end
-               
+        
+        function controller = get_controller(Sys)
+            Sys.sysd = c2d(Sys.sys, Sys.ts);
+            controller = STLC_get_controller_interval(Sys);
+        end
+        
         function QSys = init_control(QSys)
             %% Controller Initialisation
             % Time

@@ -2,3 +2,15 @@
 examples/hvac_room/hvac_det2.pdf
 
 examples/hvac_room/hvac_nondet2.pdf
+
+tutorial/BluSTL_tutorial.aux
+
+*.bbl
+
+*.blg
+
+tutorial/BluSTL_tutorial.log
+
+tutorial/BluSTL_tutorial.out
+
+tutorial/BluSTL_tutorial.synctex.gz

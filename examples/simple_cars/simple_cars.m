@@ -25,7 +25,7 @@ classdef simple_cars < STLC_lti
             
         end
         
-        function obj = get_objective(Sys, X, Y, U)
+        function obj = get_objective(Sys, X, Y, U, W, rho, wr)
             
             obj = norm(X(2,1)-1,1);
             for k=2:2*Sys.L

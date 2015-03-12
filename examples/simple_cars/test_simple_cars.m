@@ -15,7 +15,6 @@ SC.nb_stages=1; % repeats time
 % Input constraints
 SC.u_lb=-1;
 SC.u_ub=1;
-SC.u_delta=Inf; 
 
 % Disturbance signal
 w = 0*SC.time;
@@ -33,7 +32,7 @@ X0 = [X1; X2];
 SC.x0 = X0;
 
 %% STL formula
-SC.stl_list = {'alw_[0, Inf] ( (abs( X(1,t) - X(3,t) ) < 2) => alw_[0, 2] ( abs(X(2,t)) < 0.1 ))'}; 
+SC.stl_list = {'alw_[0, Inf] ( (abs( x1(t) - x3(t) ) < 2) => alw_[0, 2] ( abs(x2(t)) < 0.1 ))'}; 
 
 
 %% Plotting

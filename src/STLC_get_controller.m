@@ -11,6 +11,10 @@ function controller = STLC_get_controller(Sys)
 % :copyright: TBD
 % :license: TBD
 
+if nargin < 2
+    enc='robust';
+end
+
 %% Time
 ts=Sys.ts; % sampling time
 L=Sys.L;   % horizon (# of steps)
@@ -52,10 +56,24 @@ M = Sys.bigM;
 Pphi=sdpvar(1,1);
 for i = 1:numel(stl_list)
     phi = STLformula('phi', stl_list{i});
-    [Fphi, Pphi] = STL2MILP_robust(phi, 2*L, ts, var,M); 
+    switch enc
+        case 'boolean'
+            [Fphi, Pphi] = STL2MILP_boolean(phi, 2*L, ts, var,M); 
+        case 'robust'
+            [Fphi, Pphi] = STL2MILP_robust(phi, 2*L, ts, var,M); 
+        case 'interval'
+            [Fphi, Pphi1, Pphi2] = STL2MILP_robust_interval(phi, 2*L, ts, var,M); 
+    end
     Fstl = [Fstl Fphi];
     for j = 1:min(L, size(Pphi,2))
-        Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
+        switch enc
+            case 'boolean'
+                Fstl = [Fstl Pphi(:,j)=1]; % TODO this is specific to alw (phi), whatabout ev, until...
+            case 'robust'
+                Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
+            case 'interval'
+                Fstl = [Fstl Pphi2(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
+        end
     end
 end
 
@@ -122,7 +140,14 @@ for k=1:2*L-1
 end
 
 %% Objective function
-obj = get_objective(Sys,X,Y,U,W, Pphi(:,1), Sys.lambda_rho);
+switch enc
+    case 'boolean'
+        obj = get_objective(Sys,X,Y,U,W, Pphi(:,1), Sys.lambda_rho);
+    case 'robust'
+        obj = get_objective(Sys,X,Y,U,W, Pphi(:,1), Sys.lambda_rho);
+    case 'interval'
+        obj = get_objective(Sys,X,Y,U,W, Pphi1(:,1), Sys.lambda_rho);
+end
 
 options = Sys.solver_options;
 param_controller = {done, p, Xdone, Udone, W};

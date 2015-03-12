@@ -65,7 +65,7 @@ classdef quad_system < STLC_lti
         
         function controller = get_controller(Sys)
             Sys.sysd = c2d(Sys.sys, Sys.ts);
-            controller = STLC_get_controller_interval(Sys);
+            controller = STLC_get_controller(Sys,'interval');
         end
         
         function QSys = init_control(QSys)

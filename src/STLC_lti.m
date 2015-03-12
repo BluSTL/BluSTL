@@ -195,9 +195,9 @@ classdef STLC_lti
         
         % TODO continuous-time for system step, interface to other (NL,
         % Simulink, external) dynamics)
-        function [x1, y1] = system_step(Sys, x0, u0, w0)
+        function [x1, y0] = system_step(Sys, x0, u0, w0)
             x1 = Sys.sysd.A*x0+ Sys.sysd.B*[u0; w0];
-            y1 = Sys.sysd.C*x1+ Sys.sysd.D*[u0; w0];
+            y0 = Sys.sysd.C*x0+ Sys.sysd.D*[u0; w0];
         end
                
         % default objective function r is the robust sat. and wr a weight 

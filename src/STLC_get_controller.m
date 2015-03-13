@@ -1,4 +1,4 @@
-function controller = STLC_get_controller(Sys)
+function controller = STLC_get_controller(Sys,enc)
 % STLC_get_controller constructs the controller object for an STLC_lti instance
 %                           
 % Input: 
@@ -68,14 +68,24 @@ for i = 1:numel(stl_list)
     for j = 1:min(L, size(Pphi,2))
         switch enc
             case 'boolean'
-                Fstl = [Fstl Pphi(:,j)==1]; % TODO this is specific to alw (phi), whatabout ev, until...
+                Fstl = [Fstl Pphi(:,j) == 1]; % TODO this is specific to alw (phi), whatabout ev, until...
             case 'robust'
                 Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
             case 'interval'
                 Fstl = [Fstl Pphi2(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
+                for k=1:2*L
+                    if k==1
+                        Fstl = [Fstl, Pphi1(:,1)==Pphi2(:,2)];
+                    else
+                        % done values (history)
+                        % if k is past (done(k)==1), upper and lower bounds are equal
+                        Fstl = [Fstl, Pphi1(:,k) - (1-done(k-1))*M <=  Pphi2(:,k) <= Pphi1(:,k) + (1-done(k-1))*M];
+                    end
+                end
         end
     end
 end
+
 
 %% Input constraints
 Fu = [];

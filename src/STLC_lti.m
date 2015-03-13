@@ -211,10 +211,13 @@ classdef STLC_lti
                     obj = sum(sum(abs(U)))-wr*sum(rho);
             end
         end
-        
-        function controller = get_controller(Sys)
+      
+        function controller = get_controller(Sys,enc)
+            if nargin < 2
+                enc = 'robust';
+            end
             Sys.sysd = c2d(Sys.sys, Sys.ts);
-            controller = STLC_get_controller(Sys);
+            controller = STLC_get_controller(Sys,enc);
         end
         
         function adversary = get_adversary(Sys)

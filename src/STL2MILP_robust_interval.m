@@ -21,6 +21,7 @@ function [F,P1,P2] = STL2MILP_robust_interval(phi,k,ts,var,M)
 % :copyright: TBD
 % :license: TBD
 
+% NOT IN WORKING CONDITION
 
     if (nargin==4);
         M = 1000;
@@ -137,7 +138,9 @@ function [F,z1,z2] = pred(st,k,var,M)
          
     F = [];
     
-    zAll = [];
+    zAll1 = [];
+    zAll2 = [];
+    
     for l=1:k
         % the below conditional statements allow specifications to refer to
         % the previous and next time steps (e.g. when controlling input)
@@ -154,16 +157,28 @@ function [F,z1,z2] = pred(st,k,var,M)
         end
         t_st = regexprep(t_st,'t\)',[num2str(l) '\)']);
         
-        zl = sdpvar(size(eval(t_st),1),size(eval(t_st),2));
-        zl = eval(t_st); 
-        zAll = [zAll,zl];
+        try %upper and lower bounds
+            val = eval(t_st);
+        end
+        
+        z1Temp = sdpvar(size(val));
+        z2Temp = sdpvar(size(val));
+        F = [F, z1Temp >= val];
+        F = [F, z2Temp <= val];
+        zAll1 = [zAll1,z1Temp];
+        zAll2 = [zAll2,z2Temp];
+        
+        
     end
+    
     
     % take the and over all dimensions for multi-dimensional signals
     z1 = sdpvar(1,k);
     z2 = sdpvar(1,k);
-    for i=1:k
-        [Fnew, z1(i), z2(i)] = and(zAll(1,i),zAll(1,i),M);
+    
+    size(zAll1)
+    for i=1:k:size(zAll1,2)
+        [Fnew, z1(i), z2(i)] = and(zAll1(:,i),zAll2(:,i),M);
         F = [F, Fnew];
     end
 end

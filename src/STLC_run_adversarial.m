@@ -158,6 +158,7 @@ end
             [sol_control, errorflag1] = controller{{donen,pn,Xn,Un,Wn}};
             if(errorflag1==0)  % found a good control
                 %disp(['Yalmip: ' yalmiperror(errorflag1)])
+                disp(['Yalmip: ' 'Found a good control input'])
                 Upred = sol_control{1};
                 Xpred = sol_control{2};
             elseif (errorflag1==1 || errorflag1==15||errorflag1==12)  % some error, infeasibility or else

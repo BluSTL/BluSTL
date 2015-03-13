@@ -63,11 +63,6 @@ classdef quad_system < STLC_lti
             
         end
         
-        function controller = get_controller(Sys)
-            Sys.sysd = c2d(Sys.sys, Sys.ts);
-            controller = STLC_get_controller(Sys,'interval');
-        end
-        
         function QSys = init_control(QSys)
             %% Controller Initialisation
             % Time
@@ -160,8 +155,6 @@ classdef quad_system < STLC_lti
             end
             
         end
-        
-        
         
     end
 end

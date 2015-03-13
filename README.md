@@ -3,14 +3,13 @@ BluSTL (pronounced "blue steel") is a MATLAB toolkit for automatically generatin
 
 # Installing
 
-BluSTL depends on YALMIP \cite{YALMIP}, which is best obtained with the Multi-Parametric Toolbox
-(or MPT3, see http://control.ee.ethz.ch/~mpt/3/Main/Installation).
+BluSTL depends on YALMIP, which is best obtained with the Multi-Parametric Toolbox, or MPT3, see http://control.ee.ethz.ch/~mpt/3/Main/Installation.
 
-Most experiments have been done with the Gurobi solver \cite{gurobi} as
+Most experiments have been done with the Gurobi solver as
 back-end, though other solvers might work as well. For the example to work without modifications
 though, Gurobi needs to be installed and configured for Matlab. See http://www.gurobi.com.
 
-Once YALMIP (or MPT3), the only thing to do  is to add the path \verb+BluSTL/src+ to Matlab paths.
+Once YALMIP (or MPT3), the only thing to do  is to add the path BluSTL/src to Matlab paths.
 
 # Testing
 

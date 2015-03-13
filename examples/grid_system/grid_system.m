@@ -77,44 +77,7 @@ classdef grid_system < STLC_lti
             % calls super class constructor
             GS = GS@STLC_lti(A,Bu,Bw,C, Du, Dw);
         end
-        
-        % specialized update_plot for grid_system class (just adds legend)
-%         function GS = update_plot(GS)
-%             
-%             if isempty(GS.h)
-%                 GS.h.hf = figure;
-%                 
-%                 subplot(3,1, [1:2])
-%                 hold on;
-%                 grid on;
-%                 
-%                 GS.h.Ypast = plot(GS.system_data.time(1:end-1), GS.system_data.Y(1,:), 'LineWidth',2);
-%                 GS.h.Ymodel = plot(GS.model_data.time(1:end-1), GS.model_data.Y(1,:),'r--', 'LineWidth',2);
-% 
-%                 legend('ACEx', 'ACEx predicted');
-%                 
-%                 subplot(3,1,3)
-%                 hold on;
-%                 grid on;
-%                 GS.h.Upast = stairs([0 .1], [0 0], 'LineWidth',2);
-%                 GS.h.Umodel = stairs(GS.model_data.time(1:end-1), GS.model_data.U(1,:), 'r--', 'LineWidth',2);
-%                 
-%                 GS.h.hbutton=uicontrol(GS.h.hf,'style','pushbutton',...
-%                     'string','Stop',...
-%                     'callback','Stop()'...
-%                     );
-%             else
-%                 
-%                 set(GS.h.Ypast,'XData', GS.system_data.time(1:end-1), 'YData', GS.system_data.Y(1,:));
-%                 set(GS.h.Ymodel,'XData', GS.model_data.time(1:end-1), 'YData', GS.model_data.Y(1,:));
-%                 
-%                 set(GS.h.Upast,'XData', GS.system_data.time(1:end-1), 'YData', GS.system_data.U(1,:));
-%                 set(GS.h.Umodel,'XData', GS.model_data.time(1:end-1), 'YData', GS.model_data.U(1,:));
-%                 
-%             end
-%             
-%         end
-        
+                
         
         
     end

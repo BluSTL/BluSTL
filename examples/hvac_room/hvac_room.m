@@ -44,7 +44,7 @@ classdef hvac_room <STLC_lti
             HR.time = 0:1:1439; % time for the dynamics
             HR.ts=30; % sampling time for controller
             HR.L=L;  % horizon (# of steps)
-            HR.nb_stages=1; % repeats time
+            HR.nb_stages=3; % repeats time
             
             HR.max_react_iter=100;
             HR.min_rob = .1;

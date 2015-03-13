@@ -17,9 +17,9 @@ GridSys.Wref = w;
 
 % Bounds
 Uu_anc  = 0.6;
-GridSys.u_ub = Uu_anc;
-GridSys.u_lb = -Uu_anc;
-GridSys.u_delta = .2;
+GridSys.u_ub(:) = Uu_anc;
+GridSys.u_lb(:) = -Uu_anc;
+GridSys.u_delta(:) = .2;
 
 %% STL formula
 
@@ -27,7 +27,7 @@ GridSys.u_delta = .2;
 stl = {'alw_[0, Inf] (abs(var.Y(1,t))< .2)'};
 GridSys.stl_list = stl;
 
-GridSys.rob = 0.01;    
+GridSys.min_rob = 0.01;    
 GridSys.bigM = 1000;
 
 GridSys.plot_x = [6 13];

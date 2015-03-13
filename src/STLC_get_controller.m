@@ -68,7 +68,7 @@ for i = 1:numel(stl_list)
     for j = 1:min(L, size(Pphi,2))
         switch enc
             case 'boolean'
-                Fstl = [Fstl Pphi(:,j)=1]; % TODO this is specific to alw (phi), whatabout ev, until...
+                Fstl = [Fstl Pphi(:,j)==1]; % TODO this is specific to alw (phi), whatabout ev, until...
             case 'robust'
                 Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
             case 'interval'
@@ -142,11 +142,11 @@ end
 %% Objective function
 switch enc
     case 'boolean'
-        obj = get_objective(Sys,X,Y,U,W, Pphi(:,1), Sys.lambda_rho);
+        obj = get_objective(Sys,X,Y,U,W);
     case 'robust'
-        obj = get_objective(Sys,X,Y,U,W, Pphi(:,1), Sys.lambda_rho);
+        obj = get_objective(Sys,X,Y,U,W, Pphi(:,L), Sys.lambda_rho);
     case 'interval'
-        obj = get_objective(Sys,X,Y,U,W, Pphi1(:,1), Sys.lambda_rho);
+        obj = get_objective(Sys,X,Y,U,W, Pphi1(:,L), Sys.lambda_rho);
 end
 
 options = Sys.solver_options;

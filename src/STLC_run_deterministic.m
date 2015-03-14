@@ -196,12 +196,8 @@ end
             Xn(:,1:L) =   Sys.system_data.X(:,end-L+1:end);     %    previously computed temperatures
         end
         
-        if nw>1
-            for wx=1:nw
-                Wn(wx,:) = interp1( time , Wref(wx,:)', time_d)';
-            end
-        else
-            Wn = 0*time_d;
+        for wx=1:nw
+            Wn(wx,:) = interp1( time , Wref(wx,:)', time_d)';
         end
         
     end

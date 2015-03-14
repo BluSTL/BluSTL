@@ -15,6 +15,10 @@ Once YALMIP (or MPT3), the only thing to do  is to add the path BluSTL/src to Ma
 
 Go into BluSTL/examples/tutorials and run tutorial1.
 
+# Documentation
+
+The file BluSTL/BluSTL_tutorial.pdf describes some theoretical background with references. In addition to that, the file BluSTL/doc/index.html links to documentation generated from the Matlab code. 
+
 # Contact us
 
 Questions are to be addressed to donze@berkeley.edu or vasu@caltech.edu.

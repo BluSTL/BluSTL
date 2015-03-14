@@ -1,4 +1,4 @@
-function [Sys, params] = STLC_run_open_loop(Sys, controller)
+function [Sys, params, rob] = STLC_run_open_loop(Sys, controller)
 % STLC_run_open_loop        runs an open-loop optimal control problem 
 %                           for the system described by Sys, using the
 %                           provided controller optimizer object over the 
@@ -19,7 +19,8 @@ function [Sys, params] = STLC_run_open_loop(Sys, controller)
 global StopRequest
 StopRequest=0;
 
-rob = Sys.min_rob;
+rob= 0;
+min_rob = Sys.min_rob;
 
 %% Time
 sys = Sys.sys;
@@ -57,7 +58,7 @@ Xn = zeros(max(nx,1),2*L);
 if (nx>0)
   Xn(:,1) = x0;           % only X0 is already computed
 end
-pn(1) = rob;
+pn(1) = min_rob;
 
 Upred = zeros(nu,2*L-1);
 Xpred = zeros(nx,2*L);
@@ -121,6 +122,7 @@ end
             %disp(['Yalmip: ' yalmiperror(errorflag1)])
             Upred = sol_control{1};
             Xpred = sol_control{2};
+            rob = sol_control{3};
         elseif (errorflag1==1 || errorflag1==15||errorflag1==12)  % some error, infeasibility or else
             disp(['Yalmip error (disturbance too bad ?): ' yalmiperror(errorflag1)]); % probably there is no controller for this w
         else

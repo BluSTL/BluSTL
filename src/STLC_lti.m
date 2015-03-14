@@ -61,6 +61,7 @@ classdef STLC_lti
     
     % misc
     properties
+       stop_button 
        verbosity 
     end
     
@@ -180,6 +181,8 @@ classdef STLC_lti
             Sys.bigM = 1000;
             Sys.u_delta = Inf;
             Sys.max_react_iter = 10;
+            Sys.nb_stages = 1;
+            Sys.stop_button = 0;
             
             % default values for input constraints - note, forces u to 0
             Sys.u_lb = zeros(1,Sys.nu);

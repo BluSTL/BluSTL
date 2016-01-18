@@ -34,9 +34,9 @@ Sys.x0= [1 ; 1];
 %% Defining the controller
 % We start by defining the time instants for the whole experiment, the discrete time
 % step ts for the controller and the horizon L in number of time steps.  
-Sys.time = 0:.1:20; 
+Sys.time = 0:.1:15; 
 Sys.ts=.2; % sampling time for controller
-Sys.L=15;  % horizon is 2s in that case
+Sys.L=10;  % horizon is 2s in that case
 
 %%
 % Next we declare some constraints on control inputs, here, lower and upper
@@ -48,7 +48,7 @@ Sys.u_lb = -20; % lower bound on u
 % Then the following define a signal temporal logic formula to be satisfied
 % by the system. Note that times in the temporal operators are continuous,
 % not discrete steps. 
-Sys.stl_list = {'ev_[0,2] alw_[0,5] ( abs(y1(t)-w1(t)) < 0.1)'};
+Sys.stl_list = {'ev_[0,.8] alw_[0,2] (abs(y1(t)-w1(t)) < 0.1)'};
 
 %%
 % Now we are ready to compile the controller for our problem. 
@@ -62,30 +62,3 @@ controller = get_controller(Sys)
 %  The simplest mode to run our system with the newly created controller is in
 %  open loop. This is done with the following command:
 run_open_loop(Sys, controller);
-
-%%
-% We can run our system in closed loop, but this is not very interesting,
-% because w is 0 anyway. Let's change that 
-Sys.Wref = Sys.time*0.;
-Sys.Wref(30:40) = 1; 
-Sys.Wref(60:80) = -0.5; 
-
-
-%%
-% and the specs:
-Sys.stl_list = {'alw (ev_[0,2.] alw_[0,1] ( abs(y1(t)-w1(t)) < 0.1))'};
-controller = get_controller(Sys);
-
-%%
-% This time we will only plot input and outputs, i.e., disable the state
-% plotting:
-close;
-Sys.plot_x =[]; % default was Sys.plot_x = [1 2]
-run_deterministic(Sys, controller);
-
-%%
-% More examples are given in the folder BluSTL/examples. In particular the 
-% hvac_room case study demonstrate the adversarial scenario, as well as
-% plot customization. The idea is to create a class derived from STLC_lti
-% and specialize the update_plot method. 
-

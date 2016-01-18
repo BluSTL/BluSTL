@@ -9,7 +9,7 @@ SC = simple_cars();
 % Time
 SC.time = 0:.1:30; % time for the dynamics
 SC.ts=.2; % sampling time for controller
-SC.L=20;  % horizon (# of steps)
+SC.L=15;  % horizon (# of steps)
 SC.nb_stages=1; % repeats time
 
 % Input constraints
@@ -22,8 +22,8 @@ w(1:5) =-2;
 Wref = w;
 
 SC.Wref = Wref;
-SC.w_lb(:) = -.1;
-SC.w_ub(:) = .1;
+SC.w_lb(:) = -.5;
+SC.w_ub(:) = .5;
 
 %% Initial state
 X1 = [-10 0]';
@@ -42,10 +42,11 @@ SC.stl_list = {'alw_[0, Inf] ( (abs( x1(t) - x3(t) ) < 2) => alw_[0, 2] ( abs(x2
 %% Running stuff
 fprintf('Computing controller...\n');
 controller = get_controller(SC);
+
 fprintf('Computing adversary...\n');
 adversary = get_adversary(SC) 
 fprintf('Running...')
-%SC = run_open_loop(SC, controller);
+
 SC = run_adversarial(SC, controller, adversary)
 fprintf('\ndone.\n');
 

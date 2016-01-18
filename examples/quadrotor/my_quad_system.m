@@ -84,15 +84,14 @@ classdef quad_system <STLC_lti
         function QS = init_control(QS)
             %% Controller Initialisation
             % Time
-            QS.time = 0:.1:100; % time for the dynamics
-            QS.ts=.5; % sampling time for controller
-            QS.L=8;  % horizon (# of steps)
+            QS.time = 0:.5:100; % time for the dynamics
+            QS.ts=1; % sampling time for controller
+            QS.L=10;  % horizon (# of steps)
             QS.nb_stages=2; % repeats time
 
             QS.max_react_iter=100;
-            QS.min_rob = 0.0;
-            QS.lambda_rho = 10;
-            QS.bigM = 1e6;
+            QS.min_rob = 0.1;
+            QS.lambda_rho = 1000;
             
             % Input constraints
             QS.u_ub(:)=1;
@@ -101,14 +100,18 @@ classdef quad_system <STLC_lti
             % Initial state
             QS.x0 = [0.1; 0.1; 0.1; zeros(7,1)];
             
-            % STL formula
-             QS.stl_list = {'alw (x(t)<5 and x(t)>0)','alw (y(t)<5 and y(t)>0)','alw (z(t)<5 and z(t)>0)'};     
-             QS.stl_list{end+1} = 'alw ( (x(t)+y(t)+z(t) < 1)  => (ev_[0, 5] (x(t)+y(t)+z(t) > 14)))';            
-             QS.stl_list{end+1} = 'alw ( (x(t)+y(t)+z(t) > 14)  => (ev_[0, 5] (x(t)+y(t)+z(t) < 1)))';
-
-%             QS.stl_list{end+1} = 'alw ( (x(t)+y(t)+z(t) > 15)  => (ev_[0, 8] (x(t)+y(t)+z(t) < 3)))';
-             %QS.stl_list{end+1} = 'alw ((y(t) < 1)  => (ev_[0, 5] (y(t) > 5)))'
-             %QS.stl_list{end+1} = 'alw ((y(t) > 5)  => (ev_[0, 5] (y(t) < 1)))';
+            
+            %% STL formula
+            
+             bounds = '(x(t)<10 and x(t)>0 and y(t)>0 and y(t)<10 and z(t)<10 and z(t)>0'
+             
+             
+             QS.stl_list = {'alw (x(t)<10 and x(t)>0)','alw (y(t)<10 and y(t)>0)','alw (z(t)<10 and z(t)>0)'};
+             
+%            QS.stl_list{end+1} = 'alw ((x(t) < 1)  => (ev_[0, 5] (x(t) > 5)))';
+%            QS.stl_list{end+1} = 'alw ((x(t) > 5)  => (ev_[0, 5] (x(t) < 1)))';
+%            QS.stl_list{end+1} = 'alw ((y(t) < 1)  => (ev_[0, 5] (y(t) > 5)))';
+%            QS.stl_list{end+1} = 'alw ((y(t) > 5)  => (ev_[0, 5] (y(t) < 1)))';
 
              
 %             QS.stl_list{end+1} = 'alw ((obs1(t)<0) or ((x(t)<2) or (y(t)<2)))';
@@ -117,22 +120,21 @@ classdef quad_system <STLC_lti
            % QS = getSpecs(QS);
             
             %% Plotting
-            QS.plot_x = [1 2 3];
+            QS.plot_x = [3];
             QS.plot_y=[];
             
             %% Running stuff
             fprintf('Computing controller...\n');
             
             tic
-%            QS.controller = get_controller(QS, 'interval');
-            QS.controller = get_controller(QS, 'robust');
+            QS.controller = get_controller(QS, 'interval');
             toc            
           
         end
         
-        function QS = update_plot(QS)
+       function QS = update_plot(QS)
             QS = quad_plot(QS);
-        end
+       end
         
         function Wn = sensing(QS)
                 Wn = quad_sensing(QS);

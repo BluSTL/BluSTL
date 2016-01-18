@@ -27,7 +27,7 @@ else
 end
 ops.shade = 0.65;
 ops.color = [0.5, 0.5, 0.5];
-plot(minus(obstacles, Q), ops);
+%plot(minus(obstacles, Q), ops);
 
 
 %% Plot APs
@@ -37,7 +37,6 @@ for i = 1:numel(fields)
     ops.color = 'g';
     plot(env.AP.(fields{i}), ops);
     for j = 1:length(env.AP.(fields{i}))
-
         pts = extreme(env.AP.(fields{i})(j));
         if env.util.dim == 2
             text(mean(pts(:,1)), mean(pts(:,2)), fields{i}, 'FontSize',18)

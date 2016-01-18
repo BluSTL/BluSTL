@@ -27,6 +27,7 @@ classdef simple_cars < STLC_lti
         
         function obj = get_objective(Sys, X, Y, U, W, rho, wr)
             
+            % Objective is speed close to 1
             obj = norm(X(2,1)-1,1);
             for k=2:2*Sys.L
                 obj = obj + Sys.ts*(norm(X(2,k-1)-1,1));

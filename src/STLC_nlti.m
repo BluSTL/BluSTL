@@ -1,6 +1,5 @@
-classdef STLC_lti < handle
-    %STLC_lti generic ABCD/ABuBwCDuDw system controller
-    %
+classdef STLC_nlti < handle
+    %STLC_nlti generic x' = f(x,u) system controller. Linearlized at each time step.
     
     % system properties
     properties
@@ -33,10 +32,7 @@ classdef STLC_lti < handle
         encoding  % specifies the technique for encoding TODO
         min_rob    % TODO: if rob==0 use non robust encoding
         lambda_rho %  weight of robustness in the cost function
-        lambda_t1  %  used for the interval encoding to weight the first time
-                   %  step higher than the rest
         bigM
-        nrm       % norm (default is 1)
         solver_options
         model_data
         controller    % YALMIP parametric problem for the controller
@@ -74,7 +70,7 @@ classdef STLC_lti < handle
     
     methods
         % Constructor
-        function Sys = STLC_lti(varargin)
+        function Sys = STLC_nlti(varargin)
             
             switch nargin
                 
@@ -119,7 +115,7 @@ classdef STLC_lti < handle
             nx = max([size(A,1), size(Bu,1), size(Bw,1),1]);
             nu = max([size(Bu,2), size(Du,1)]);
             if nu == 0
-                errormSys('System must have at least one input (non empty Bu or Du matrix)');
+                errormsg('System must have at least one input (non empty Bu or Du matrix)');
             end
             nw = max([size(Bw,2), size(Dw,1),1]);
             ny = max([size(C,1), size(Du,1), size(Dw,1),1]);
@@ -197,11 +193,9 @@ classdef STLC_lti < handle
                           'gurobi.SolutionLimit', solnLimit,'cachesolvers',1);
 
             Sys.min_rob = 0.01;
-            Sys.lambda_rho = 1;
-            Sys.lambda_t1 = 1;
+            Sys.lambda_rho = 0;
             Sys.bigM = 1000;
             Sys.u_delta = Inf;
-            Sys.nrm = 1;
             Sys.max_react_iter = 10;
             Sys.nb_stages = 1;
             Sys.stop_button = 0;
@@ -219,20 +213,16 @@ classdef STLC_lti < handle
         end
         
         % default objective function r is the robust sat. and wr a weight
-        function obj = get_objective(Sys, X, Y, U,W, rho,wr,wt1)
+        function obj = get_objective(Sys, X, Y, U,W, rho,wr)
             switch nargin
                 case {4,5}
-                    obj = norm(sum(abs(U),2), Sys.nrm); % minimize U
+                    obj = sum(sum(abs(U))); % minimize U
                 case 6
-                    obj = norm(sum(abs(U),2), Sys.nrm)-norm(sum(rho,2), Sys.nrm); % minimize U penalized by r
+                    obj = sum(sum(abs(U)))-sum(sum(rho)); % minimize U penalized by r
                 case 7
-                    obj = norm(sum(abs(U),2), Sys.nrm)-wr*norm(sum(rho,2), Sys.nrm);
-                case 8
-                    obj = -wr*wt1*norm(rho(:,1), Sys.nrm)-wr*norm(sum(rho(:,2:end),2), Sys.nrm)+norm(sum(abs(U),2), Sys.nrm);
+                    obj = sum(sum(abs(U)))-wr*sum(sum(rho));
             end
         end
-        
-
                
         % System step, using the continuous time simulation
         function [Y,T,X] = system_step(Sys, u0, t, x0, w0)
@@ -362,31 +352,53 @@ classdef STLC_lti < handle
         
         % Executes controller and adversary in open loop
         function Sys = run_open_loop_adv(Sys, controller, adversary)
-            STLC_run_open_loop_adv(Sys, controller, adversary)
+            Sys = Sys.reset_data();
+            [Sys, status_u, status_w] = compute_input_adv(Sys, controller, adversary);
+            
+            if (status_w ~= 1)
+                warning('The control input might not be robust.')
+            end
+            
+            if status_u==0
+                current_time =0;
+                while (current_time < Sys.model_data.time(end)-Sys.ts)
+                    out = sprintf('time:%g', current_time );
+                    rfprintf(out);
+                    Sys = Sys.apply_input();
+                    Sys = Sys.update_plot();
+                    drawnow;
+                    current_time= Sys.system_data.time(end);
+                end
+                fprintf('\n');
+            end
+            
         end
         
         % Executes controller and adversary in receding horizon mode (MPC)
         function Sys = run_adversarial(Sys, controller, adversary)
-           STLC_run_adversarial(Sys, controller, adversary)
+            global StopRequest;
+            StopRequest=0;
+            Sys = Sys.reset_data();
+            rfprintf_reset();
+            current_time =0;
+            while ((current_time < Sys.time(end)-Sys.L*Sys.ts)&&StopRequest==0)
+                out = sprintf('time:%g', current_time );
+                rfprintf(out);
+                [Sys, status_u, status_w] = Sys.compute_input_adv(controller, adversary);
+                
+                if status_u~=0
+                    rfprintf_reset();
+                    StopRequest=1;
+                end
+                
+                Sys = Sys.apply_input();
+                Sys = Sys.update_plot();
+                drawnow;
+                current_time= Sys.system_data.time(end);
+            end
+            fprintf('\n');
         end
         
-        function rob = monitor(Sys,phi,enc)
-           Sys.h = [];
-           col = ['r','b','g'];
-           Sys.stl_list{1} = phi;
-           Sys.min_rob= -Sys.bigM;
-           Sys.controller = get_controller(Sys,enc);
-           Sys = Sys.run_open_loop(Sys.controller);
-           rob = Sys.model_data.rob;
-           figure;
-           hold on;
-           if strcmp(enc,'interval')
-               plot(Sys.model_data.time(1:size(rob,2)), rob(1,:), 'b', 'LineWidth',2);
-               plot(Sys.model_data.time(1:size(rob,2)), rob(2,:), 'r', 'LineWidth',2);
-           else
-               plot(Sys.model_data.time(1:size(rob,2)), rob(1,:), 'g', 'LineWidth',2);
-           end
-        end
         
         % Default plot function
         function Sys = update_plot(Sys)
@@ -397,6 +409,17 @@ classdef STLC_lti < handle
             Wn = STLC_sensing(Sys);
         end
         
+        % linearlization
+        function obj = get_objective(Sys, X, Y, U,W, rho,wr)
+            switch nargin
+                case {4,5}
+                    obj = sum(sum(abs(U))); % minimize U
+                case 6
+                    obj = sum(sum(abs(U)))-sum(sum(rho)); % minimize U penalized by r
+                case 7
+                    obj = sum(sum(abs(U)))-wr*sum(sum(rho));
+            end
+        end
         
     end
 end

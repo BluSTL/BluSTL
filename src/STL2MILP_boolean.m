@@ -1,10 +1,11 @@
-function [F,P] = STL2MILP_boolean(phi,k,ts,var,M)
+ function [F,P] = STL2MILP_boolean(phi,kList,kMax,ts,var,M)
 % STL2MILP_boolean  constructs MILP constraints in YALMIP that compute
 %                   the boolean satisfaction for specification phi
 %
 % Input: 
 %       phi:    an STLformula
-%       k:      the length of the trajectory
+%       kList:  a list of time steps at which the formula is to be enforced
+%       kMAx:   the length of the trajectory
 %       ts:     the interval (in seconds) used for discretizing time
 %       var:    a dictionary mapping strings to variables
 %       M:   	a large positive constant used for big-M constraints  
@@ -12,11 +13,11 @@ function [F,P] = STL2MILP_boolean(phi,k,ts,var,M)
 % Output: 
 %       F:  YALMIP constraints
 %       P:  YALMIP decision variables representing the boolean satisfaction 
-%           over each time step from 1 to k 
+%           over each time step in kList
 %
 % :copyright: TBD
 % :license: TBD
-
+    
     if (nargin==4);
         M = 1000;
     end;
@@ -32,78 +33,76 @@ function [F,P] = STL2MILP_boolean(phi,k,ts,var,M)
     
     a = interval(1);
     b = interval(2);
-    
-    if a == Inf
-        a = k;
-    end
-    if b == Inf
-        b = k;
-    end
-    
+        
     a = max([0 floor(a/ts)-1]); 
     b = ceil(b/ts)-1; 
+    
+    if b==Inf
+        b = kMax;
+    end
        
     switch (phi.type)
         
         case 'predicate'
-            [F,P] = pred(phi.st,k,var);
+            [F,P] = pred(phi.st,kList,var);
             
         case 'not'
-            [Frest,Prest] = STL2MILP_boolean(phi.phi, k, ts, var,M);
+            [Frest,Prest] = STL2MILP_boolean(phi.phi,kList,kMax,ts, var,M);
             [Fnot, Pnot] = not(Prest);
             F = [F, Fnot, Frest];
             P = Pnot;
 
         case 'or'
-            [Fdis1,Pdis1] = STL2MILP_boolean(phi.phi1, k, ts, var,M);
-            [Fdis2,Pdis2] = STL2MILP_boolean(phi.phi2, k, ts, var,M);
+            [Fdis1,Pdis1] = STL2MILP_boolean(phi.phi1,kList,kMax,ts, var,M);
+            [Fdis2,Pdis2] = STL2MILP_boolean(phi.phi2,kList,kMax,ts, var,M);
             [For, Por] = or([Pdis1;Pdis2]);
             F = [F, For, Fdis1, Fdis2];
             P = Por;
 
         case 'and'
-            [Fcon1,Pcon1] = STL2MILP_boolean(phi.phi1, k, ts, var,M);
-            [Fcon2,Pcon2] = STL2MILP_boolean(phi.phi2, k, ts, var,M);
+            [Fcon1,Pcon1] = STL2MILP_boolean(phi.phi1,kList,kMax,ts, var,M);
+            [Fcon2,Pcon2] = STL2MILP_boolean(phi.phi2,kList,kMax,ts, var,M);
             [Fand, Pand] = and([Pcon1;Pcon2]);
             F = [F, Fand, Fcon1, Fcon2];
             P = Pand;
 
         case '=>'
-            [Fant,Pant] = STL2MILP_boolean(phi.phi1, k, ts, var,M);
-            [Fcons,Pcons] = STL2MILP_boolean(phi.phi2, k, ts, var,M);
+            [Fant,Pant] = STL2MILP_boolean(phi.phi1,kList,kMax,ts, var,M);
+            [Fcons,Pcons] = STL2MILP_boolean(phi.phi2,kList,kMax,ts, var,M);
             [Fnotant,Pnotant] = not(Pant);
             [Fimp, Pimp] = or([Pnotant;Pcons]);
             F = [F, Fant, Fnotant, Fcons, Fimp];
             P = Pimp;
             
         case 'always'
-            [Frest,Prest] = STL2MILP_boolean(phi.phi, k, ts, var,M);
-            [Falw, Palw] = always(Prest, a,b, k);
+            kListAlw = unique(cell2mat(arrayfun(@(k) {min(kMax,k + a): min(kMax,k + b)}, kList)));
+            [Frest,Prest] = STL2MILP_boolean(phi.phi,kListAlw,kMax,ts, var,M);
+            [Falw, Palw] = always(Prest, a,b, kList,kMax);
             F = [F, Falw];
             P = [P, Palw];
             F = [F, Frest];
 
         case 'eventually'
-            [Frest,Prest] = STL2MILP_boolean(phi.phi, k, ts, var,M);
-            [Fev, Pev] = eventually(Prest, a,b, k);
+            kListEv = unique(cell2mat(arrayfun(@(k) {min(kMax,k + a): min(kMax,k + b)}, kList)));
+            [Frest,Prest] = STL2MILP_boolean(phi.phi,kListEv,kMax,ts, var,M);
+            [Fev, Pev] = eventually(Prest, a,b, kList,kMax);
             F = [F, Fev];
             P = [P, Pev];
             F = [F, Frest];
           
         case 'until'
-            [Fp,Pp] = STL2MILP_boolean(phi.phi1, k, ts, var,M);
-            [Fq,Pq] = STL2MILP_boolean(phi.phi2, k, ts, var,M);
+            [Fp,Pp] = STL2MILP_boolean(phi.phi1,kList,kMax,ts, var,M);
+            [Fq,Pq] = STL2MILP_boolean(phi.phi2,kList,kMax,ts, var,M);
             [Funtil, Puntil] = until([Pp,Pq,a,b,k]);
             F = [F, Funtil, Fp, Fq];
             P = Puntil;
     end
 end
 
-function [F,z] = pred(st,k,var)
+function [F,z] = pred(st,kList,var)
     % Enforce constraints based on predicates 
-    % 
     % var is the variable dictionary    
-        
+    
     fnames = fieldnames(var);
     
     for ifield= 1:numel(fnames)
@@ -120,54 +119,35 @@ function [F,z] = pred(st,k,var)
         st= [ '(' tokens{1}{1} ')-(' tokens{1}{2} ')' ];
     end
     
-    
     F = [];
-    zAll = [];
+    z = [];
     
     bigM = 1000;
-    bigMst1 = 'bigM*zAll(:,t)';
-    bigMst2 = 'bigM*(1 - zAll(:,t))';
+    bigMst1 = 'bigM*z(:,t)';
+    bigMst2 = 'bigM*(1 - z(:,t))';
   
- 
+    k = size(kList,2);
+    
     for l=1:k
         
-        % the below conditional statements allow specifications to refer to
-        % the previous and next time steps (e.g. when controlling input)
         t_st = st;
-        if l<k
-            t_st = regexprep(t_st,'t+1\)',[num2str(l+1) '\)']);
-        else
-            t_st = regexprep(t_st,'t+1\)',[num2str(l) '\)']);
-        end
-        if l>1
-            t_st = regexprep(t_st,'t-1\)',[num2str(l-1) '\)']);
-        else
-            t_st = regexprep(t_st,'t-1\)',[num2str(l) '\)']);
-        end
-        t_st = regexprep(t_st,'\(t',['\(',num2str(l)]);
-        t_st = regexprep(t_st,',t\)',[',',num2str(l) '\)']);
+        t_st = regexprep(t_st,'\<t\>', num2str(kList(l)));
+
+        % ADD VARIABLES
+        zl = binvar(1,1);
+        z = [z,zl];
         
-        zl = sdpvar(size(eval(t_st),1),1);
-        zAll = [zAll,zl];
+        % ADD CONSTRAINTS
         
-        bigM_l = regexprep(bigMst1,'\(t',['\(',num2str(l)]);
-        bigM_l = regexprep(bigM_l,',t\)',[',',num2str(l) '\)']);
-        t_st1 = [t_st '<=' bigM_l];
+        bigM1 = regexprep(bigMst1,',t\)',[',',num2str(l) '\)']);
+        t_st1 = [t_st '<=' bigM1];
         F = [F, eval(t_st1)];
         
-        bigM_l = regexprep(bigMst2,'\(t',['\(',num2str(l)]);
-        bigM_l = regexprep(bigM_l,',t\)',[',',num2str(l) '\)']);
-        t_st2 = ['-(' t_st ') <= ' bigM_l];
+        bigM2 = regexprep(bigMst2,',t\)',[',',num2str(l) '\)']);
+        t_st2 = ['-(' t_st ') <= ' bigM2];
         F = [F, eval(t_st2)];
         
     end
-    % take the and over all dimension for multi-dimensional signals
-    z = sdpvar(1,k);
-    for i=1:k
-        [Fnew, z(:,i)] = and(zAll(:,i));
-        F = [F, Fnew];
-    end
-    
 end
 
 
@@ -204,37 +184,39 @@ function [F,P] = not(p_list)
     F = [P(:) == 1 - p_list(:)];
 end
 
-function [ia, ib] = getIndices(i,a,b,k)
-    ia = min(k,i+a);
-    ib = min(k,i+b);
-end
 
-function [F,P_alw] = always(P, a,b, k)
+function [F,P_alw] = always(P, a,b,kList,kMax)
     F = [];
+    k = size(kList,2);
     P_alw = sdpvar(1,k);
-    
+    kListAlw = unique(cell2mat(arrayfun(@(k) {min(kMax,k + a) : min(kMax,k + b)}, kList)));    
     for i = 1:k
-        [ia, ib] = getIndices(i,a,b,k);
-        [F0,P0] = and(P(ia:ib)');
+        [ia, ib] = getIndices(kList(i),a,b,kMax);
+        ia_real = find(kListAlw==ia);
+        ib_real = find(kListAlw==ib);
+        [F0,P0] = and(P(ia_real:ib_real)');
         F = [F;F0,P_alw(i)==P0];
     end
     
 end
 
 
-function [F,P_ev] = eventually(P, a,b, k)
+function [F,P_ev] = eventually(P, a,b,kList,kMax)
     F = [];
+    k = size(kList,2);
     P_ev = sdpvar(1,k);
-    
+    kListEv = unique(cell2mat(arrayfun(@(k) {min(kMax,k + a) : min(kMax,k + b)}, kList)));   
     for i = 1:k
-        [ia, ib] = getIndices(i,a,b,k);
-        [F0,P0] = or(P(ia:ib)');
+        [ia, ib] = getIndices(kList(i),a,b,kMax);
+        ia_real = find(kListEv==ia);
+        ib_real = find(kListEv==ib);
+        [F0,P0] = or(P(ia_real:ib_real)');
         F = [F;F0,P_ev(i)==P0];
     end
     
 end
 
-function [F,P_until] = until(Pp,Pq,a,b,j)
+function [F,P_until] = until(Pp,Pq,a,b,k)
     
     %PhiU[a,b]Psi = G[0,a]Phi /\ F[a,b]Psi /\ F{a}(PhiUPsi)
 
@@ -245,7 +227,7 @@ function [F,P_until] = until(Pp,Pq,a,b,j)
     [F2,P2] = eventually(Pq, a,b, k);
     
     %(PhiUPsi)
-    [F_unt,P_unt] = until_untimed(Pp,Pq,j,k);
+    [F_unt,P_unt] = until_untimed(Pp,Pq,k);
     
     %F{a}(PhiUPsi)
     [F3,P3] = eventually(P_unt, a,a, k);
@@ -286,4 +268,10 @@ function [F,P_until] = until_untimed(Pp,Pq,k)
     [F2,P2] = and([Pp(k),P1]);
     [F3,P3] = or([Pq(k),P2]);
     F = [F, F0,F1,F2,F3, P_until(k) == P3]; 
+end
+
+
+function [ia, ib] = getIndices(i,a,b,k)
+    ia = min(k,i+a);
+    ib = min(k,i+b);
 end

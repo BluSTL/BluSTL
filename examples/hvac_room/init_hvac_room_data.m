@@ -1,5 +1,5 @@
 clear all;
-load('RoomHVAC_model_data.mat');
+load('hvac_room_model_data.mat');
 
 M8=x(1);
 Mw1=x(2);
@@ -31,9 +31,9 @@ Rwin3tot=(Rvalin+Rvalgl+Rvalout)/(H*L1*beta3);
 LT=1084;                            % Time at which we linearize the system
 x0=TSim8(LT,1:5)';                  % state near which we are seeking an equilibrium point
 u0=[mdot8(LT) Tdis8(LT) T7(LT) Tout(LT) T10(LT) Qsun(LT)]';     % input near which we are seeking an equilibrium point
-[xe,ue,ye,dxe,options] = trim('RoomSubsystem',x0,u0);     % trim gives back the equilibrium point near the given points
+[xe,ue,ye,dxe,options] = trim('hvac_room_model',x0,u0);     % trim gives back the equilibrium point near the given points
 
-[A,B,C,D] = linmod('RoomSubsystem',xe,ue);
+[A,B,C,D] = linmod('hvac_room_model',xe,ue);
 
 sys = ss(A,B,C,D);
  

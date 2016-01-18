@@ -28,7 +28,7 @@ ny=Sys.ny;
 % variables
 X = sdpvar(nx, 2*L); 
 U = sdpvar(nu, 2*L-1);
-Y = sdpvar(ny, 2*L-1);
+Y = sdpvar(ny, 2*L);
 
 % parameters 
 W = sdpvar(nw, 2*L);
@@ -39,6 +39,10 @@ Xdone = sdpvar(nx, 2*L);
 
 %% STL formula
 Fstl = [];
+Pstl = [];
+Pstllow = [];
+Pstlup = [];
+
 varStd = struct('X',X,'Y', Y,'U',U, 'W', W);
 
 if isstruct(Sys.var)
@@ -53,36 +57,39 @@ end
 stl_list= STLC_parse_stl_labels(Sys);
 M = Sys.bigM;
 
-Pphi=sdpvar(1,1);
 for i = 1:numel(stl_list)
     phi = STLformula('phi', stl_list{i});
     switch enc
         case 'boolean'
-            [Fphi, Pphi] = STL2MILP_boolean(phi, 2*L, ts, var,M); 
+            [Fphi, Pphi] = STL2MILP_boolean(phi, [1:L], 2*L, ts, var,M); 
+            Pstl = [Pstl; Pphi];
         case 'robust'
-            [Fphi, Pphi] = STL2MILP_robust(phi, 2*L, ts, var,M); 
+            [Fphi, Pphi] = STL2MILP_robust(phi, [1:L], 2*L, ts, var,M);
+            Pstl = [Pstl; Pphi];
         case 'interval'
-            [Fphi, Pphi1, Pphi2] = STL2MILP_robust_interval(phi, 2*L, ts, var,M); 
+            [Fphi, Pphilow, Pphiup] = STL2MILP_robust_interval(phi, [1:2*L], 2*L, ts, var,M); 
+            Pstllow = [Pstllow; Pphilow];
+            Pstlup = [Pstlup; Pphiup];
     end
     Fstl = [Fstl Fphi];
-    for j = 1:min(L, size(Pphi,2))
-        switch enc
-            case 'boolean'
-                Fstl = [Fstl Pphi(:,j) == 1]; % TODO this is specific to alw (phi), whatabout ev, until...
-            case 'robust'
-                Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
-            case 'interval'
-                Fstl = [Fstl Pphi2(:,j)>= p(j)]; % TODO this is specific to alw (phi), whatabout ev, until...
-                for k=1:2*L
-                    if k==1
-                        Fstl = [Fstl, Pphi1(:,1)==Pphi2(:,2)];
-                    else
-                        % done values (history)
-                        % if k is past (done(k)==1), upper and lower bounds are equal
-                        Fstl = [Fstl, Pphi1(:,k) - (1-done(k-1))*M <=  Pphi2(:,k) <= Pphi1(:,k) + (1-done(k-1))*M];
-                    end
+    
+    % add constraints to enforce satisfaction
+    switch enc
+        case 'boolean'
+            for j = 1:min(L, size(Pphi,2))
+                if Sys.min_rob > 0
+                    Fstl = [Fstl Pphi(:,j) == 1];
                 end
-        end
+            end
+        case 'robust'
+            for j = 1:min(L, size(Pphi,2))
+                Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), what about ev, until...
+            end
+        case 'interval'
+            %Fstl = [Fstl Pphilow(:,1)>= p(1)]; % TODO this is specific to alw (phi), what about ev, until...
+            for j = 1:min(L, size(Pphiup,2))
+               Fstl = [Fstl Pphiup(:,j)>= p(j)]; % TODO this is specific to alw (phi), what about ev, until...
+            end      
     end
 end
 
@@ -122,6 +129,7 @@ Bdu=Bd(:,1:nu);
 Bdw=Bd(:,nu+1:end);
 Ddu=Dd(:,1:nu);
 Ddw=Dd(:,nu+1:end);
+K = Sys.K;
 
 % Constraints for states (if any)
 for k=1:2*L
@@ -133,7 +141,7 @@ for k=1:2*L
         Fdyn = [Fdyn, Xdone(:,k) - (1-done(k-1))*M <=  X(:,k) <= Xdone(:, k)+ (1-done(k-1))*M];
         
         % not done values
-        Fdyn = [Fdyn, ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )) - done(k-1)*M) <=  X(:,k) <= ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )) + done(k-1)*M)];
+        Fdyn = [Fdyn, ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 ) + K) - done(k-1)*M) <=  X(:,k) <= ((Ad*X(:,k-1) + Bdu*U(:,k-1) + Bdw*W( :, k-1 )+ K) + done(k-1)*M)];
     end
 end
 
@@ -149,20 +157,28 @@ for k=1:2*L-1
         Fdyn = [Fdyn, Y(:,k) == Cd*X(:,k)+ Ddu*U(:,k) + Ddw *W(:,k)];
 end
 
+options = Sys.solver_options;
+param_controller = {done, p, Xdone, Udone, W};
+if strcmp(enc,'interval')
+    output_controller =  {U,X,[Pstllow;Pstlup]};
+else
+    output_controller =  {U,X,Pstl};
+end
+
+
+if numel(stl_list) == 0
+    Pstl = sdpvar(1,1);
+end
+
 %% Objective function
 switch enc
     case 'boolean'
-        obj = get_objective(Sys,X,Y,U,W);
+        obj = get_objective(Sys,X,Y,U);
     case 'robust'
-        obj = get_objective(Sys,X,Y,U,W, Pphi(:,L), Sys.lambda_rho);
+        obj = get_objective(Sys,X,Y,U,W, Pstl(:,1:L-1), Sys.lambda_rho);
     case 'interval'
-        obj = get_objective(Sys,X,Y,U,W, Pphi1(:,L), Sys.lambda_rho);
+        obj = get_objective(Sys,X,Y,U,W, Pstllow, Sys.lambda_rho, Sys.lambda_t1);
 end
-
-options = Sys.solver_options;
-param_controller = {done, p, Xdone, Udone, W};
-output_controller =  {U,X,Pphi};
-
 
 controller = optimizer([Fdyn, Fstl, Fu],obj,options,param_controller, output_controller);
 

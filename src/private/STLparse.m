@@ -13,10 +13,10 @@ function phi = STLparse(phi,varargin)
 %  - phi       : is the STLformula to create
 %  - phi_str   : a string describing the formula. This string must follow
 %                the grammar described in the STLformula documentation
-%  - phi0      : a STL Formula
-%  - phi1      : a STL Formula
-%  - phi2      : a STL Formula
-%  - phin      : a STL Formula
+%  - phi0      : an STL Formula
+%  - phi1      : an STL Formula
+%  - phi2      : an STL Formula
+%  - phin      : an STL Formula
 %  - unary_op  : is either 'not', 'ev', 'alw', 'eventually' or 'always'
 %  - unary_op2 : is either 'ev', 'alw', 'eventually' or 'always'
 %  - binary_op : is either 'or', 'and' or '=>'
@@ -94,7 +94,7 @@ switch(numel(varargin))
         
         % test eventually
         [success, st1, st2] = parenthesisly_balanced_split(st, '\<ev\>');
-        if success
+        if (success&&isempty(st1))
             phi1 = STLformula([phi.id '1__'],st2);
             phi = STLparse(phi, 'ev', phi1);
             return
@@ -102,7 +102,7 @@ switch(numel(varargin))
         
         % test eventually_[ti,tf]
         [success, st1, st2, interval] = parenthesisly_balanced_split(st, '\<ev_\[(.+?)\]\>');
-        if success
+        if success&&isempty(st1)
             phi1 = STLformula([phi.id '1__'],st2);
             phi = STLparse(phi,'ev',interval,phi1);
             return
@@ -111,7 +111,7 @@ switch(numel(varargin))
         
         % test always
         [success, st1, st2] = parenthesisly_balanced_split(st, '\<alw\>');
-        if success
+        if success&&isempty(st1)
             phi1 = STLformula([phi.id '1__'],st2);
             phi = STLparse(phi, 'alw', phi1);
             return
@@ -119,7 +119,7 @@ switch(numel(varargin))
         
         % test alw_[ti,tf]
         [success, st1, st2, interval] = parenthesisly_balanced_split(st, '\<alw_\[(.+?)\]\>');
-        if success
+        if success&&isempty(st1)
             phi1 = STLformula([phi.id '1__'],st2);
             phi = STLparse(phi,'alw',interval,phi1);
             return
@@ -127,7 +127,7 @@ switch(numel(varargin))
 
         % test not
         [success, st1, st2] = parenthesisly_balanced_split(st, '\<not\>');
-        if success
+        if success&&isempty(st1)
             phi1 = STLformula([phi.id '1__'],st2);
             phi = STLparse(phi, 'not', phi1);
             return

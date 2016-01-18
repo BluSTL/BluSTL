@@ -33,8 +33,7 @@ classdef STLC_lti < handle
         encoding  % specifies the technique for encoding TODO
         min_rob    % TODO: if rob==0 use non robust encoding
         lambda_rho %  weight of robustness in the cost function
-        lambda_t1  %  used for the interval encoding to weight the first time
-                   %  step higher than the rest
+
         bigM
         nrm       % norm (default is 1)
         solver_options
@@ -48,7 +47,6 @@ classdef STLC_lti < handle
         Wref           % this defines a default or initial disturbance vector
         w_lb           % lower bound on w relative to Wref
         w_ub           % upper bound on w relative to Wref
-        stl_w_list     % stl properties for environment (TODO)
         max_react_iter % maximum number of iterations
         adversary      % YALMIP parametric problem for the adversary
     end
@@ -380,12 +378,7 @@ classdef STLC_lti < handle
            rob = Sys.model_data.rob;
            figure;
            hold on;
-           if strcmp(enc,'interval')
-               plot(Sys.model_data.time(1:size(rob,2)), rob(1,:), 'b', 'LineWidth',2);
-               plot(Sys.model_data.time(1:size(rob,2)), rob(2,:), 'r', 'LineWidth',2);
-           else
-               plot(Sys.model_data.time(1:size(rob,2)), rob(1,:), 'g', 'LineWidth',2);
-           end
+           plot(Sys.model_data.time(1:size(rob,2)), rob(1,:), 'g', 'LineWidth',2);
         end
         
         % Default plot function

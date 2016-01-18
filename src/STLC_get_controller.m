@@ -66,10 +66,6 @@ for i = 1:numel(stl_list)
         case 'robust'
             [Fphi, Pphi] = STL2MILP_robust(phi, [1:L], 2*L, ts, var,M);
             Pstl = [Pstl; Pphi];
-        case 'interval'
-            [Fphi, Pphilow, Pphiup] = STL2MILP_robust_interval(phi, [1:2*L], 2*L, ts, var,M); 
-            Pstllow = [Pstllow; Pphilow];
-            Pstlup = [Pstlup; Pphiup];
     end
     Fstl = [Fstl Fphi];
     
@@ -85,11 +81,6 @@ for i = 1:numel(stl_list)
             for j = 1:min(L, size(Pphi,2))
                 Fstl = [Fstl Pphi(:,j)>= p(j)]; % TODO this is specific to alw (phi), what about ev, until...
             end
-        case 'interval'
-            %Fstl = [Fstl Pphilow(:,1)>= p(1)]; % TODO this is specific to alw (phi), what about ev, until...
-            for j = 1:min(L, size(Pphiup,2))
-               Fstl = [Fstl Pphiup(:,j)>= p(j)]; % TODO this is specific to alw (phi), what about ev, until...
-            end      
     end
 end
 
@@ -159,11 +150,7 @@ end
 
 options = Sys.solver_options;
 param_controller = {done, p, Xdone, Udone, W};
-if strcmp(enc,'interval')
-    output_controller =  {U,X,[Pstllow;Pstlup]};
-else
-    output_controller =  {U,X,Pstl};
-end
+output_controller =  {U,X,Pstl};
 
 
 if numel(stl_list) == 0
@@ -176,8 +163,6 @@ switch enc
         obj = get_objective(Sys,X,Y,U);
     case 'robust'
         obj = get_objective(Sys,X,Y,U,W, Pstl(:,1:L-1), Sys.lambda_rho);
-    case 'interval'
-        obj = get_objective(Sys,X,Y,U,W, Pstllow, Sys.lambda_rho, Sys.lambda_t1);
 end
 
 controller = optimizer([Fdyn, Fstl, Fu],obj,options,param_controller, output_controller);

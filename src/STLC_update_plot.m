@@ -103,5 +103,5 @@ catch % updading didn't work (either first call, or figure was closed or some ot
             'callback','STLC_Stop()'...
             );
     end
-    endcd ..
+end
 end

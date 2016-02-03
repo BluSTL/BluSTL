@@ -1,4 +1,3 @@
-addpath env
 %% Create the system
 IS = integrator(6);
 IS = init_control(IS);

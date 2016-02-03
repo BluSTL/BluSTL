@@ -99,6 +99,8 @@ classdef hvac_room <STLC_lti
             
             if isempty(HR.h)
                 
+                
+                
                 time = HR.time;
                 Wref = HR.Wref;
                 
@@ -151,6 +153,15 @@ classdef hvac_room <STLC_lti
                 
                 legend('Input Air Flow (ft^3/min)');
                 set(gca, 'XLim', XLim, 'XTick', 0:3:time(end)/60, 'FontSize', 14);
+                
+                % Stop button
+                if HR.stop_button
+                    HR.h.hbutton=uicontrol(HR.h.hf,'style','pushbutton',...
+                        'string','Stop',...
+                        'callback','STLC_Stop()'...
+                        );
+                end
+
                 
             else
                 set(HR.h.Tpast, 'Xdata', HR.system_data.time/60, 'Ydata',HR.system_data.X(5,:));

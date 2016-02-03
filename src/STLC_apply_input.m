@@ -5,7 +5,7 @@ sys_time = [Sys.time(it) Sys.time(it+1)];
 
 w_new = get_disturbance(Sys);
 
-u_new = interp1(Sys.model_data.time(1:end-1),Sys.model_data.U', sys_time', 'previous' )';
+u_new = interp1(Sys.model_data.time(1:end-1),Sys.model_data.U', sys_time', 'previous', 'extrap')';
 x0 = Sys.system_data.X(:,it);
 
 [Y,T,X] = system_step(Sys, u_new, sys_time, x0, w_new);

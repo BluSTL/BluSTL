@@ -23,19 +23,19 @@ classdef STLC_lti < handle
     properties
         u_lb
         u_ub
-        u_delta
+        u_delta = Inf
         ts         % sampling time
         L          % horizon
         time
-        nb_stages
+        nb_stages = 1 
         var
         stl_list
         encoding  % specifies the technique for encoding TODO
-        min_rob    % TODO: if rob==0 use non robust encoding
-        lambda_rho %  weight of robustness in the cost function
+        min_rob = 0.01   % TODO: if rob==0 use non robust encoding
+        lambda_rho = 1   %  weight of robustness in the cost function
 
-        bigM
-        nrm       % norm (default is 1)
+        bigM = 1000
+        nrm  = 1     % norm (default is 1)
         solver_options
         model_data
         controller    % YALMIP parametric problem for the controller
@@ -44,11 +44,11 @@ classdef STLC_lti < handle
     
     % adversary properties
     properties
-        Wref           % this defines a default or initial disturbance vector
-        w_lb           % lower bound on w relative to Wref
-        w_ub           % upper bound on w relative to Wref
-        max_react_iter % maximum number of iterations
-        adversary      % YALMIP parametric problem for the adversary
+        Wref                % this defines a default or initial disturbance vector
+        w_lb                % lower bound on w relative to Wref
+        w_ub                % upper bound on w relative to Wref
+        max_react_iter =10  % maximum number of iterations
+        adversary           % YALMIP parametric problem for the adversary
     end
     
     % plotting properties
@@ -66,7 +66,7 @@ classdef STLC_lti < handle
     
     % misc
     properties
-        stop_button
+        stop_button = 1
         verbose
     end
     
@@ -187,23 +187,16 @@ classdef STLC_lti < handle
             solver = 'gurobi';  % gurobi, cplex, glpk
             timeLimit = 2000;
             gapLimit = 0.1;
+            gapAbsLimit = 0.01;
             solnLimit = Inf;
             verb = 1;
             Sys.solver_options = sdpsettings('verbose', verb,'solver', solver, ...
                           'gurobi.TimeLimit', timeLimit, ...
                           'gurobi.MIPGap', gapLimit, ...
-                          'gurobi.SolutionLimit', solnLimit,'cachesolvers',1);
-
-            Sys.min_rob = 0.01;
-            Sys.lambda_rho = 1;
-            Sys.lambda_t1 = 1;
-            Sys.bigM = 1000;
-            Sys.u_delta = Inf;
-            Sys.nrm = 1;
-            Sys.max_react_iter = 10;
-            Sys.nb_stages = 1;
-            Sys.stop_button = 0;
-            
+                          'gurobi.MIPGapAbs', gapAbsLimit, ...
+                          'gurobi.SolutionLimit', solnLimit,...
+                          'cachesolvers',1);
+                      
             % default values for input constraints - note, forces u to 0
             Sys.u_lb = zeros(1,Sys.nu);
             Sys.u_ub = zeros(1,Sys.nu);
@@ -393,5 +386,4 @@ classdef STLC_lti < handle
         
     end
 end
-
 

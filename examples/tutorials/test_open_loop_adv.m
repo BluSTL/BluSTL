@@ -30,7 +30,7 @@ Sys.stl_list = {'alw ( (y1(t) < 0.2) and (-y1(t)<0.2))'};
 Sys.min_rob = 0.;
 Sys.lambda_rho = 100;
 Sys.stop_button=1;
-Sys.bigM = 1000;
+
 Sys.solver_options.verbose = 1;
 
 tic;
@@ -44,16 +44,3 @@ toc;
 Sys = Sys.reset_data();
 %Sys = run_open_loop_adv(Sys, controller, adversary); 
 Sys = run_adversarial(Sys, controller, adversary); 
-
-% Sys= compute_input(Sys,controller);
-% Sys.update_plot();
-% Sys= compute_disturbance(Sys,adversary);
-% Sys.update_plot();
-% Sys= compute_input(Sys,controller);
-% Sys.update_plot();
-% Sys= compute_disturbance(Sys,adversary);
-% Sys.update_plot();
-
-
-%Sys= Sys.run_open_loop(controller);
-%Sys= Sys.run_deterministic(controller);

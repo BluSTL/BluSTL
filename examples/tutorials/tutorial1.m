@@ -1,4 +1,3 @@
-echo on
 %% Defining the plant dynamics 
 % The toolbox is organized around one main class, called STLClti. An
 % STLClti object is primarily a continuous Linear Time Invariant (LTI) 
@@ -34,21 +33,21 @@ Sys.x0= [1 ; 1];
 %% Defining the controller
 % We start by defining the time instants for the whole experiment, the discrete time
 % step ts for the controller and the horizon L in number of time steps.  
-Sys.time = 0:.1:20; 
+Sys.time = 0:.1:15; 
 Sys.ts=.2; % sampling time for controller
-Sys.L=15;  % horizon is 2s in that case
+Sys.L=10;  % horizon is 2s in that case
 
 %%
 % Next we declare some constraints on control inputs, here, lower and upper
 % bounds:
-Sys.u_ub = 20;  % upper bound on u 
-Sys.u_lb = -20; % lower bound on u
+Sys.u_ub = 10;  % upper bound on u 
+Sys.u_lb = -10; % lower bound on u
 
 %%
 % Then the following define a signal temporal logic formula to be satisfied
 % by the system. Note that times in the temporal operators are continuous,
 % not discrete steps. 
-Sys.stl_list = {'ev_[0,2] alw_[0,5] ( abs(y1(t)-w1(t)) < 0.1)'};
+Sys.stl_list = {'ev_[0,1.] alw_[0,2] (abs(y1(t)-w1(t)) < 0.1)'};
 
 %%
 % Now we are ready to compile the controller for our problem. 
@@ -59,21 +58,21 @@ controller = get_controller(Sys)
 % the input. 
 
 %% Testing the controller
-%  The simplest mode to run our system with the newly created controller is in
-%  open loop. This is done with the following command:
+% The simplest mode to run our system with the newly created controller is in
+% open loop. This is done with the following command:
 run_open_loop(Sys, controller);
 
 %%
-% We can run our system in closed loop, but this is not very interesting,
-% because w is 0 anyway. Let's change that 
+% We can run the system in closed loop, but this is not very interesting,
+% because w is 0 anyway. Let us change this: 
 Sys.Wref = Sys.time*0.;
 Sys.Wref(30:40) = 1; 
 Sys.Wref(60:80) = -0.5; 
 
 
 %%
-% and the specs:
-Sys.stl_list = {'alw (ev_[0,2.] alw_[0,1] ( abs(y1(t)-w1(t)) < 0.1))'};
+% and the specifications:
+Sys.stl_list = {'alw (ev_[0,1.] alw_[0,0.5] ( abs(y1(t)-w1(t)) < 0.1))'};
 controller = get_controller(Sys);
 
 %%
@@ -85,7 +84,7 @@ run_deterministic(Sys, controller);
 
 %%
 % More examples are given in the folder BluSTL/examples. In particular the 
-% hvac_room case study demonstrate the adversarial scenario, as well as
+% hvac_room case study demonstrates the adversarial scenario, as well as
 % plot customization. The idea is to create a class derived from STLC_lti
 % and specialize the update_plot method. 
 

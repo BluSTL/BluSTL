@@ -9,7 +9,7 @@ Most experiments have been done with the Gurobi solver as
 back-end, though other solvers might work as well. For the example to work without modifications
 though, Gurobi needs to be installed and configured for Matlab. See http://www.gurobi.com.
 
-Once YALMIP (or MPT3), the only thing to do  is to add the path BluSTL/src to Matlab paths.
+Once YALMIP (or MPT3), the only thing to do is to add the path BluSTL/src to Matlab paths.
 
 # Testing
 

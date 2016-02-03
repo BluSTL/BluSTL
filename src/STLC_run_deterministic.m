@@ -43,8 +43,3 @@ fprintf('\n');
 
 end
 
-function Stop()
-global StopRequest;
-StopRequest = true;
-end
-

@@ -13,7 +13,7 @@ Once YALMIP (or MPT3), the only thing to do is to add the path BluSTL/src to Mat
 
 # Testing
 
-Go into BluSTL/examples/tutorials and run tutorial1.
+Go into BluSTL/examples/tutorials and run tutorial1. Note that the examples folder contains stable examples except for those located under the misc folder. 
 
 # Documentation
 

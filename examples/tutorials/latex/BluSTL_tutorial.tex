@@ -131,7 +131,7 @@ where
 Given a sampling time $\dt>0$, we discretize $\Sigma$ into 
 $\Sigma_d$ of the form
 \begin{eqnarray}
-x(t_{k+1}) &= &A^d x(t_k) + B^d_u u(t_k) + B^d_w w(t_k)  \label{eq:dynd} \\ 
+x(t_{k+1}) - x(t_k) &= &A^d x(t_k) + B^d_u u(t_k) + B^d_w w(t_k)  \label{eq:dynd} \\ 
  y(t_k) &=& C^d x(t_k) + D^d_u u(t_k) + D^d_w w(t_k)  \label{eq:outd}
 \end{eqnarray}
 
